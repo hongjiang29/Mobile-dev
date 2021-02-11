@@ -9,15 +9,6 @@ class Home extends Component{
 
         return(
             <View style={styles.container}>
-                <Text style={styles.text}>Home</Text>
-                <Button
-                title="Login"
-                onPress={() => navigation.navigate('Login')}/>
-
-                <Button
-                title="Contact"
-                onPress={() => navigation.navigate('Contact')}/>   
-
                 <Button
                 title="Logout"
                 onPress={() => navigation.navigate('Logout')}/>   
@@ -26,7 +17,6 @@ class Home extends Component{
         );
 
     }
-
 }
 
 const styles = StyleSheet.create({

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Text, TextInput, View, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BackHandler } from 'react-native';
 
 class App extends Component {
   constructor(props){
@@ -8,14 +9,32 @@ class App extends Component {
 
     this.state = {
       username: '',
-      password: ''
+      password: '',
+      error: ''
     };
+  }
+
+  componentDidMount() {
+    this.unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.checkLoggedIn();
+    })
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
+
+  checkLoggedIn = async () => {
+    const value = await AsyncStorage.getItem('token');
+    if (value != null) {
+      Alert.alert('You are already logged in!')
+      this.props.navigation.navigate('Home')
+    }
   }
 
   login = async () => {
     let email = this.state.username;
     let password = this.state.password;
-    const navigation = this.props.navigation;
     fetch("http://10.0.2.2:3333/api/1.0.0/user/login",
       {
         method: 'post',
@@ -41,10 +60,16 @@ class App extends Component {
         };
       })
       .then (async(responseJson) => {
-        console.log(responseJson);
-        await AsyncStorage.setItem('@session_token', responseJson.token);
-        navigation.navigate('Home');
-      })
+        let idRequest = (responseJson)['id'];
+        let tokenRequest = (responseJson)['token'];
+
+        console.log("DEBUG: id received: " + idRequest +" token received " + tokenRequest);
+
+        this.setState({id:idRequest});
+        this.setState({token:tokenRequest});
+
+        this.storeLogin().then();
+        })
       .catch((message) => {console})
 }
 
@@ -55,6 +80,27 @@ class App extends Component {
   handlePassword = (text) => {
     this.setState({password: text})
   }
+
+  async storeLogin()
+	{
+		try
+		{
+			let id = "" + this.state.id;
+			let token = "" + this.state.token;
+
+			console.log("DEBUG: Storing ID: " + id + " Storing token: " + token);
+
+			await AsyncStorage.setItem('id', id);
+			await AsyncStorage.setItem('token', token);
+
+			console.log("DEBUG: Success");
+			this.props.navigation.navigate('Home');
+		}
+		catch (e)
+		{
+			console.log("DEBUG: Failed to store id and token: " + e);
+		}
+	}
 
   render() {
     const navigation = this.props.navigation;
@@ -70,13 +116,31 @@ class App extends Component {
       <Text style={styles.appButtonText}> Login </Text>
         
       </TouchableOpacity>
-      <Button
-                title="Signup"
-                onPress={() => navigation.navigate('Signup')}/>
+
+      <TouchableOpacity style={styles.appButtonContainer} onPress={() => navigation.navigate('Signup')}>
+      
+      <Text style={styles.appButtonText}> Signup </Text>
+        
+      </TouchableOpacity>
 
       </View>
     );
   }
+  async getId()
+	{
+		try
+		{
+			const id = await AsyncStorage.getItem('id');
+			console.log("DEBUG: userId found: " + id);
+			return id + "" ;
+		}
+		catch (e)
+		{
+			console.log("DEBUG: Failed to get userId: " + e);
+			this.props.navigation.navigate('Logout');
+		}
+	}
+
 }
 
 const styles = StyleSheet.create({
@@ -88,6 +152,8 @@ const styles = StyleSheet.create({
     elevation: 8,
     backgroundColor: "#009688",
     borderRadius: 10,
+    padding: 5,
+    margin: 10,
     paddingVertical: 10,
     paddingHorizontal: 12
   },
