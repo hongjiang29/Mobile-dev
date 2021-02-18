@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler'
 
-import React, { Component } from 'react';
+import React, { Component, Button } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
@@ -15,6 +15,9 @@ import Logout from './Component/logout'
 import HomeScreen from './Component/home_with_buttons'
 import UpdateAccount from './Component/updateAccount'
 import Reviews from './Component/reviews'
+import AddReview from './Component/add_review'
+import { Alert } from 'react-native';
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -56,7 +59,9 @@ class App extends Component{
         return(
         <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Review" component={Reviews} />
+        <Stack.Screen name="Review" component={Reviews}
+         />
+        <Stack.Screen name="AddReview" component={AddReview} />
         </Stack.Navigator>
         )
     }

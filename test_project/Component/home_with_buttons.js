@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import {View, Text, StyleSheet, Button} from 'react-native';
+import {View, Text, StyleSheet, Button} from 'native-base';
 
-class Home extends Component{
+class Home extends React.Component{
 
     render(){
     
@@ -19,20 +19,6 @@ class Home extends Component{
     }
 }
 
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: 'forestgreen'
-    },
-    text: {
-      color: 'white',
-      fontSize: 25
-    },
-  
-    
-  
-  });
+
 
 export default Home

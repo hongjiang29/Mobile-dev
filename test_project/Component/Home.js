@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { View, Text,  TouchableOpacity, ToastAndroid, FlatList, StyleSheet,SafeAreaView, Image, StatusBar, Alert } from 'react-native';
+import { View, TouchableOpacity, ToastAndroid, FlatList, StyleSheet,SafeAreaView, StatusBar, Alert, Image } from 'react-native';
+import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import StarRating from 'react-native-star-rating';
 
 class Home extends Component{
 
@@ -19,7 +21,7 @@ class Home extends Component{
     this.unsubscribe = this.props.navigation.addListener('focus', () => {
       this.checkLoggedIn();
     });
-    
+    this.getFavourite();
     this.getData();
   }
 
@@ -57,9 +59,7 @@ class Home extends Component{
           throw 'failed';
         }
       })
-      .then ((responseJson) => {
-          
-        })
+
       .catch((message) => {console})
 };
 
@@ -123,23 +123,19 @@ unfavourite = async (location_id) => {
             isLoading: false,
             listData: responseJson
           })
+          
         })
       .catch((message) => {console})
 };
 
-checkFavourite = async (location_id) => {
-  this.getFavourite();
+checkFavourite(location_id){
   console.log(location_id)
-  console.log('hello' + this.state.favouritePlaces)
   if (this.state.favouritePlaces.includes(location_id)) {
-    console.log('unfollow')
-    this.unfavourite(location_id);
+    return true
   } else {
-    console.log('follow')
-    this.favourite(location_id);
+    return false
   }
 }
-
 
 getFavourite = async () => {
   const value = await AsyncStorage.getItem('token');
@@ -164,13 +160,11 @@ getFavourite = async () => {
       }
     })
     .then ((responseJson) => {
-      console.log(responseJson)
       const favs = (responseJson.favourite_locations);
       this.setState({
         favouritePlaces: []
       });
       favs.forEach(element => {
-
         this.setState({
           favouritePlaces: [...this.state.favouritePlaces, element.location_id]
       });
@@ -178,41 +172,82 @@ getFavourite = async () => {
   console.log(this.state.favouritePlaces)
       })
     .catch((message) => {console})
-};
+}
+
+  renderAuthButton = (location_id) => {
+    let bool = this.checkFavourite(location_id)
+    console.log(bool)
+    if (bool == true) {
+    return <Button transparent onPress={() => this.unfavourite(location_id)}>
+            <Icon active name="heart" />
+            <Text>UnFavourite</Text>
+          </Button>
+  } else {
+    return <Button transparent onPress={() => this.favourite(location_id)}>
+            <Icon active name="heart-outline" />
+            <Text>Favourite</Text>
+          </Button>
+  }
+}
+
     render()  {
         if (this.state.isLoading){
           return (
-
+  
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
               <Text>Loading..</Text>  
             </View>
           );
         } else{
-          const SeparatorComponent = () => {
-            return <View style={styles.separatorLine} />
-          }
-
+        
           return (
-            <SafeAreaView style={styles.container}>
+            <Container>
+              <Header />
               <FlatList
                 data={this.state.listData}
                 renderItem={({ item }) => (
-          
-                      <View style={styles.items}>
-                     <TouchableOpacity onPress={() => this.props.navigation.navigate('Review', {id: item.location_id})}>
-                      <Text>{item.location_name}</Text>
-                      </TouchableOpacity>
-                      
-                      <TouchableOpacity 
-                      onPress={() => this.checkFavourite(item.location_id)}>
-                        <Text style={styles.appButtonText}>Favourite</Text>
-                       </TouchableOpacity>
-                  </View>
+                  <TouchableOpacity onPress={() => this.props.navigation.navigate('Review', {id: item.location_id})}>
+                  <Content>
+                  <Card>
+                    <CardItem>
+                      <Left>
+                        <Thumbnail source={{uri: 'https://picsum.photos/id/237/200/300'}} />
+                        <Body>
+                          <Text>{item.location_name}</Text>
+                          <Text note>{item.location_town}</Text>
+                        </Body>
+                      </Left>
+                    </CardItem>
+                    <CardItem cardBody>
+                      <Image source={{uri: 'https://picsum.photos/seed/picsum/200/300'}} style={{height: 200, width: null, flex: 1}}/>
+                    </CardItem>
+                    <CardItem>
+                      <Left>
+                      {this.renderAuthButton(item.location_id)}
+                      </Left>
+                      <Body>
+                      </Body>
+                      <Right>
+                      <Text>
+                        <StarRating
+                          containerStyle={styles.review}
+                          starSize={25}
+                          disabled={true}
+                          maxStars={5}
+                          rating={item.avg_overall_rating}
+                          fullStarColor={'gold'}/>
+                        </Text>
+                      </Right>
+                    </CardItem>
+                    </Card>
+            </Content>
+                  </TouchableOpacity>
                   )}
-                  ItemSeparatorComponent={SeparatorComponent}
+                  
                   keyExtractor={(item,index) => item.location_id.toString()}
         /> 
-            </SafeAreaView>
+
+            </Container>
           );
         }
         }

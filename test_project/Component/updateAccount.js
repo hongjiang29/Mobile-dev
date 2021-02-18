@@ -10,53 +10,20 @@ class updateAccount extends Component {
         first_name: '',
         last_name: '',
         Newemail: '',
-        Newpassword: '',
-        TOKEN: '',
-        ID: ''
-    };
+        Newpassword: ''
   }
-
-  componentDidMount() {
-    this.getToken()
-  }
-
-  getToken = async () => {
-    try {
-      let token = await AsyncStorage.getItem('token');
-      let id = await AsyncStorage.getItem('id');
-      console.log("Token is  :", token + "     id is :" + id);
-      this.setState({
-        TOKEN : token,
-        ID : id});   
-    } catch (error) {
-      console.log("GET TOKEN ERROR : " + error);
-    }
-  }
-
-  async logout() {
-    try {
-      fetch("http://10.0.2.2:3333/api/v1.0.0/logout", 
-      {
-        method: 'POST',
-        headers: {
-          'X-Authorization': this.state.TOKEN
-        },
-      });
-      navigation.navigate('Login')
-    }
-    catch (error) {
-      console.error(error);
-    }
-  }
+}
 
   editAccount = async () => {
+    const userId = await AsyncStorage.getItem('id');
+    const token = await AsyncStorage.getItem('token');
     try{
-      fetch("http://10.0.2.2:3333/api/v1.0.0/user/"+this.state.ID,
+      fetch("http://10.0.2.2:3333/api/1.0.0/user/"+userId,
       {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'X-Authorization': this.state.TOKEN
+          'X-Authorization': token
         },
         body: JSON.stringify({
           first_name: this.state.first_name,
@@ -66,11 +33,9 @@ class updateAccount extends Component {
         })
         })
         .then ((res) => {
-            console.log(res)
             if (res.status === 200)
             {
-              navigation.navigate('Contact', { screen: 'Contact' });
-              return res.json();
+              this.props.navigation.navigate('Contact', { screen: 'Contact' });
             }else if (res.status === 400){
               throw 'Validation';
             }
@@ -84,8 +49,6 @@ class updateAccount extends Component {
         console.error(error);
       }
 }
-  
-
 
   render() {
     return (
@@ -129,15 +92,6 @@ class updateAccount extends Component {
           <Text style={styles.ButtonText}> Edit </Text>
 
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.Button}
-          onPress=
-          {
-            () => this.logout()
-          }>
-          <Text style={styles.ButtonText}> Logout </Text>
-        </TouchableOpacity>
-
       </View>
     );
   }
