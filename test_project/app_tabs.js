@@ -16,7 +16,7 @@ import HomeScreen from './Component/home_with_buttons'
 import UpdateAccount from './Component/updateAccount'
 import Reviews from './Component/reviews'
 import AddReview from './Component/add_review'
-import { Alert } from 'react-native';
+import EditReview from './Component/edit_review'
 
 
 const Tab = createBottomTabNavigator();
@@ -59,9 +59,9 @@ class App extends Component{
         return(
         <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Review" component={Reviews}
-         />
+        <Stack.Screen name="Review" component={Reviews}/>
         <Stack.Screen name="AddReview" component={AddReview} />
+        <Stack.Screen name="EditReview" component={EditReview} />
         </Stack.Navigator>
         )
     }

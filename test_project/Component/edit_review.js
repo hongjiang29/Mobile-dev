@@ -2,52 +2,27 @@ import React, { Component } from 'react';
 import { Text, TextInput, View, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as ImagePicker from 'react-native-image-picker';
 
 
-class AddReview extends Component {
+class EditReview extends Component {
   constructor(props){
     super(props);
-
+    console.log(props)
     this.state = {
-      overall_rating: 5,
-      price_rating: 5,
-      quality_rating: 5,
-      clenliness_rating: 5,
-      review_body: '',
-      params: props.route.params.id,
-      image: {}
+      overall_rating: props.route.params.review.overall_rating,
+      price_rating: props.route.params.review.price_rating,
+      quality_rating: props.route.params.review.quality_rating,
+      clenliness_rating: props.route.params.review.clenliness_rating,
+      review_body: props.route.params.review.review_body,
+      review_id: props.route.params.review.review_id,
+      location_id: props.route.params.loc_id
     };
   }
 
-  cameraLaunch = () => {
-    let options = {
-      storageOptions: {
-        skipBackup: true,
-        path: 'images',
-      },
-    };
-    ImagePicker.launchCamera(options, (res) => {
-      console.log('Response = ', res);
-
-      if (res.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (res.error) {
-        console.log('ImagePicker Error: ', res.error);
-      } else if (res.customButton) {
-        console.log('User tapped custom button: ', res.customButton);
-        alert(res.customButton);
-      } else {
-        const source = { uri: res.uri };
-        console.log('response', JSON.stringify(res));
-        this.setState({ image: source});
-      }
-    });
-}
-
-  addreview = async () => {
+  editreview = async () => {
     const navigation = this.props.navigation;
-    let id = this.state.params;
+    let review_id = this.state.review_id;
+    let loc_id = this.state.location_id;
     let overall_rating = this.state.overall_rating;
     let price_rating = this.state.price_rating;
     let quality_rating = this.state.quality_rating;
@@ -55,9 +30,9 @@ class AddReview extends Component {
     let review_body = this.state.review_body;
     const Token = await AsyncStorage.getItem('token');
     console.log(overall_rating)
-    fetch("http://10.0.2.2:3333/api/1.0.0/location/"+id+"/review",
+    fetch("http://10.0.2.2:3333/api/1.0.0/location/"+loc_id+"/review/"+review_id,
       {
-        method: 'post',
+        method: 'patch',
         headers: {
           'X-Authorization' : Token,
           "Content-Type": "application/json"
@@ -72,7 +47,7 @@ class AddReview extends Component {
 
       })
       .then ((res) => {
-        if (res.status === 201)
+        if (res.status === 200)
         {
           navigation.navigate('Review');
           return res.json();
@@ -159,15 +134,9 @@ class AddReview extends Component {
                 value={this.state.review_body}/>
         
 
-      <TouchableOpacity style={styles.appButtonContainer} onPress={() => this.addreview()}>
+      <TouchableOpacity style={styles.appButtonContainer} onPress={() => this.editreview()}>
       
-      <Text style={styles.appButtonText}> Add </Text>
-        
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.appButtonContainer} onPress={() => this.cameraLaunch()}>
-      
-      <Text style={styles.appButtonText}> Take a Photo </Text>
+      <Text style={styles.appButtonText}> Edit </Text>
         
       </TouchableOpacity>
       </View>
@@ -198,4 +167,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default AddReview
+export default EditReview

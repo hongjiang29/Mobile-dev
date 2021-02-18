@@ -22,9 +22,9 @@ class Reviews extends Component{
   componentDidMount() {
     this.unsubscribe = this.props.navigation.addListener('focus', () => {
       this.checkLoggedIn();
+      this.getLikes();
+      this.getData();
     });
-    this.getLikes();
-    this.getData();
   }
 
   componentWillUnmount() {
@@ -231,11 +231,10 @@ deleteReview = async (location_id, review_id) => {
   }
 }
 
-  renderEditButton = (review_id) => {
-    let bool = this.checkReviews(review_id)
-    let id = this.state.params;
+  renderEditButton = (item, loc_id) => {
+    let bool = this.checkReviews(item.review_id)
     if (bool == true) {
-    return <Button transparent onPress={() => this.unLike(id, review_id)}>
+    return <Button transparent onPress={() => this.props.navigation.navigate('EditReview', {review: item, loc_id: loc_id})}>
             <Icon active name="md-hammer" /> 
             <Text>Edit</Text>
           </Button>
@@ -262,6 +261,7 @@ deleteReview = async (location_id, review_id) => {
             );
           } else{
             const item = this.state.listData
+            const loc_id = item.location_id
         return (
           <Container>
             <Header>
@@ -339,7 +339,7 @@ deleteReview = async (location_id, review_id) => {
                       {this.renderDeleteButton(item.review_id)}
                       </Body>
                       <Right>
-                      {this.renderEditButton(item.review_id)}
+                      {this.renderEditButton(item, loc_id)}
                       </Right>
                     </CardItem>
                     </Card>
