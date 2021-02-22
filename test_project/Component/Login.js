@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { TextInput, View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
-import { Container, Form, Content, Card, CardItem, Input, Text, Button, Icon, Left, Body, Right, Item } from 'native-base';
+import { Container, Form, Content, Card, CardItem, Input, Text, Header, Title, Left, Body, Right, Item } from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
@@ -11,7 +11,10 @@ class App extends Component {
     this.state = {
       email: '',
       password: '',
-      error: ''
+      error: '',
+      errorEmail: '',
+      errorLength: '',
+      isValidEmail: true
     };
   }
 
@@ -28,26 +31,17 @@ class App extends Component {
   checkLoggedIn = async () => {
     const value = await AsyncStorage.getItem('token');
     if (value != null) {
-      this.props.navigation.navigate('Home')
+      this.props.navigation.reset({routes: [{name : 'Home'}]});
     }
   }
 
   login = async () => {
     let email = this.state.email;
     let password = this.state.password;
-    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    if(email == ""){
-      Alert.alert('Please fill email!')
-      return false
-    }
-    else if (reg.test(email) === false) {
-      Alert.alert("Invalid email inserted!");
-      return false;
-    }else if(password == ""){
-      Alert.alert('Please fill password!')
-      return false
-    }else if(password.length < 5){
-      Alert.alert('Password less than 5 characters!')
+
+    if (email.length == 0 || password.length == 0){
+      this.setState({errorLength: 'At least one of the fields are empty, check all fields',
+                     isNull: false})
       return false
     }
   
@@ -69,7 +63,7 @@ class App extends Component {
         {
           return res.json();
         }else if (res.status === 400){
-          Alert.alert('Cannot find account, please check your details')
+          this.setState({errorLength:'Cannot find account, please check your details'})
           throw 'Validation';
         }
         else{
@@ -91,11 +85,13 @@ class App extends Component {
 }
 
   handleEmail = (text) => {
-    this.setState({email: text})
+    this.setState({isNull:false,
+                  email: text})
   }
 
   handlePassword = (text) => {
-    this.setState({password: text})
+    this.setState({isNull:false,
+                  password: text})
   }
 
   async storeLogin()
@@ -111,7 +107,7 @@ class App extends Component {
 			await AsyncStorage.setItem('token', token);
 
 			console.log("DEBUG: Success");
-			this.props.navigation.navigate('Home');
+			this.props.navigation.reset({routes: [{name : 'Home'}]});
 		}
 		catch (e)
 		{
@@ -121,22 +117,39 @@ class App extends Component {
 
   render() {
     const navigation = this.props.navigation;
+    const handleEmail = (val) => {
+      const expression = /(?!.*\.{2})^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([\t]*\r\n)?[\t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([\t]*\r\n)?[\t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
+      
+      if(expression.test(String(val).toLowerCase()) || val.length == 0){
+        this.setState({isValidEmail: true})
+      }else {
+        this.setState({errorEmail: 'Invalid email input!',
+                      isValidEmail: false})
+        
+      }
+  }
     return (
       <Container>
+      <Header>
+      <Title style={{fontWeight:'bold', fontSize:20, alignSelf: 'center'}}>LOGIN</Title>
+      </Header>
    
       <View style={styles.container}>
       
       <Form style={{paddingLeft: 20, paddingRight:20}}>
       <Item style={{marginTop:20}}>
-      <Input style={styles.inputText} placeholder="Enter email" onChangeText={this.handleEmail} value={this.state.email} />
+      <Input style={styles.inputText} placeholder="Enter email" onChangeText={this.handleEmail} value={this.state.email} onEndEditing={(e)=>handleEmail(e.nativeEvent.text)}/>
       </Item>
+      {this.state.isValidEmail ? null :
+      <Text style={{paddingLeft: 20, paddingRight:20, color:'red'}}>{this.state.errorEmail}</Text>}
       <Text>
       {this.state.error}
       </Text>
       <Item style={{marginTop:20}}>
       <Input style={styles.inputText} placeholder="Enter Password" secureTextEntry={true} onChangeText={this.handlePassword} value={this.state.password} />
       </Item>
-      
+      {this.state.isNull ? null :
+      <Text style={{paddingLeft: 20, paddingRight:20, color:'red'}}>{this.state.errorLength}</Text>}
       <TouchableOpacity style={styles.appButtonContainer} onPress={() => this.login()}>
       
       <Text style={styles.appButtonText}> Login </Text>

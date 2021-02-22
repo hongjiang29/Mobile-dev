@@ -8,11 +8,10 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import Login from './Component/Login'
-import Contact from './Component/contact'
+import Account from './Component/updateAccount'
 import Home from './Component/Home'
 import Signup from './Component/signup'
 import Logout from './Component/logout'
-import HomeScreen from './Component/home_with_buttons'
 import UpdateAccount from './Component/updateAccount'
 import Reviews from './Component/reviews'
 import AddReview from './Component/add_review'
@@ -26,7 +25,7 @@ class App extends Component{
     return (
         <NavigationContainer>
             
-        <Stack.Navigator initialRouteName="Login">
+        <Stack.Navigator initialRouteName="Login" screenOptions={{headerShown: false}}>
         <Stack.Screen name="Home" component={HomeLogstack} />
         <Stack.Screen name="Review" component={Reviews}/>
         <Stack.Screen name="AddReview" component={AddReview} />
@@ -51,7 +50,7 @@ class App extends Component{
                         iconName = focused ? 'home' : 'home-outline';
                     } else if (route.name === 'Logout') {
                         iconName = focused ? 'person' : 'person-outline';
-                    }else if (route.name === 'Contact') {
+                    }else if (route.name === 'Account') {
                         iconName = focused ? 'send' : 'send-outline';
                 }
                 return <Ionicons name={iconName} size={size} color={color} />
@@ -64,7 +63,7 @@ class App extends Component{
             }}
             >
             <Tab.Screen name="Home" component={Home} />
-            <Tab.Screen name="Contact" component={Contact} />
+            <Tab.Screen name="Account" component={Account} />
             <Tab.Screen name="Logout" component={Logout} />
             </Tab.Navigator>
         )

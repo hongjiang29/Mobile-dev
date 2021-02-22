@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import { Text, TextInput, View, Image, StyleSheet, Alert, ScrollView, TouchableOpacity, StatusBar, SafeAreaView} from 'react-native';
-import { Container, Content, Header } from 'native-base';
+import { TextInput, View, Image, StyleSheet, Alert, ScrollView, TouchableOpacity, StatusBar, SafeAreaView} from 'react-native';
+import { Container, Form, Header, Title, CardItem, Item, Input, Text, Button, Icon, Left, Body, Right, Content } from 'native-base';
 import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'react-native-image-picker';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import Filter from 'bad-words';
 
 
 class AddReview extends Component {
@@ -13,16 +12,18 @@ class AddReview extends Component {
     super(props);
 
     this.state = {
-      overall_rating: 5,
-      price_rating: 5,
-      quality_rating: 5,
-      clenliness_rating: 5,
+      overall_rating: 0,
+      price_rating: 0,
+      quality_rating: 0,
+      clenliness_rating: 0,
       review_body: '',
       params: props.route.params.id,
       image: false,
       listData: [],
       file: {},
-      fileUri: ''
+      isNull: true,
+      fileUri: '',
+      errorLength: '',
     };
   }
 
@@ -80,11 +81,14 @@ getData = async () => {
   addreview = async () => {
     const navigation = this.props.navigation;
     let id = this.state.params;
-    let overall_rating = this.state.overall_rating;
-    let price_rating = this.state.price_rating;
-    let quality_rating = this.state.quality_rating;
-    let clenliness_rating = this.state.clenliness_rating;
-    let review_body = this.state.review_body;
+    let {overall_rating, price_rating, quality_rating, clenliness_rating, review_body} = this.state;
+  
+    if (overall_rating == 0 || price_rating == 0 || quality_rating == 0 || clenliness_rating == 0 || review_body.length == 0){
+      this.setState({errorLength: 'One of the ratings or review box is empty!',
+                     isNull: false})
+      return false
+    }
+
     var Filter = require('bad-words'),
     filter = new Filter();
     filter.addWords('tea', 'cakes', 'pastries');
@@ -156,22 +160,27 @@ getData = async () => {
   }
 
   handleOverall = (rating) => {
-    this.setState({overall_rating: rating})
+    this.setState({isNull: true,
+                   overall_rating: rating})
   }
   handlePrice = (rating) => {
-    this.setState({price_rating: rating})
+    this.setState({isNull: true,
+                   price_rating: rating})
   }
 
   handleQuality = (rating) => {
-    this.setState({quality_rating: rating})
+    this.setState({isNull: true,
+                   quality_rating: rating})
   }
 
   handleCleniness = (rating) => {
-    this.setState({clenliness_rating: rating})
+    this.setState({isNull: true,
+                   clenliness_rating: rating})
   }
 
   handleBody = (text) => {
-    this.setState({review_body: text})
+    this.setState({isNull: true,
+                   review_body: text})
   }
 
   renderFileUri() {
@@ -198,9 +207,23 @@ getData = async () => {
   render() {
     return (
       <Container>
-        <Header/>
+        <Header>
+            <Left>
+            <Button transparent onPress={() => this.props.navigation.goBack()}>
+              <Icon name='arrow-back' />
+            </Button>
+              </Left>
+              <Body>
+              <Title style={{fontWeight:'bold', fontSize:20}}>Add Review</Title>
+
+              </Body>
+              <Right>
+              </Right>
+           </Header>
         <Content>
       <View style={styles.container}>
+      <Form style={{paddingLeft: 20, paddingRight:20}}>
+      <Item style={{marginTop:20}}>
           <Text>
           Overall Rating: {"\n"}
             <StarRating
@@ -242,15 +265,20 @@ getData = async () => {
                 fullStarColor={'gold'}
                 selectedStar={(rating) => this.handleCleniness(rating)}/>{"\n"}
             </Text>
+            </Item>
+            <Item style={{marginTop:20}}>
             <Text>
             Review/Comment: {"\n"}
-            </Text>
-            <TextInput
+            </Text></Item>
+            <Item>
+            <Input
                 placeholder="Review away..."
                 multiline={true}
-                numberOfLines={1}
                 value={this.state.review_body}
-                onChangeText={(value) => this.handleBody(value)}/>
+                onChangeText={(value) => this.handleBody(value)}/></Item>
+
+            {this.state.isNull ? null :
+            <Text style={{paddingLeft: 20, paddingRight:20, color:'red'}}>{this.state.errorLength}</Text>}
                 
         
 
@@ -270,6 +298,7 @@ getData = async () => {
       {this.renderFileUri()}
         </View>
       </View>
+      </Form>
       </View>
       </Content>
       </Container>
@@ -284,12 +313,14 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   appDeleteContainer: {
-    marginTop: 10,
-    elevation: 8,
     backgroundColor: "red",
+    width: 50,
+    marginTop: 10,
+    elevation: 3,
     borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 12
+    padding: 5,
+    margin: 10,
+    alignSelf: 'center'
   },
   appButtonContainer: {
     marginTop: 10,
@@ -297,7 +328,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#009688",
     borderRadius: 10,
     paddingVertical: 10,
-    paddingHorizontal: 12
+    paddingHorizontal: 12,
   },
   appButtonText: {
     fontSize: 18,
@@ -314,8 +345,8 @@ const styles = StyleSheet.create({
     margin: 10,
     justifyContent: 'center',
     alignItems: 'center'
-
   },
+  
   ImageSections: {
     display: 'flex',
     flexDirection: 'row',

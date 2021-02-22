@@ -3,7 +3,7 @@ import React, { Component,} from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
 import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Container, Header, Card, CardItem, Text, Button, Icon, Left, Body, Right} from 'native-base';
+import { Container, Header, Card, CardItem, Text, Button, Icon, Left, Body, Right, Title, Subtitle} from 'native-base';
 
 class Reviews extends Component{
   constructor(props){
@@ -24,9 +24,9 @@ class Reviews extends Component{
   componentDidMount() {
     this.unsubscribe = this.props.navigation.addListener('focus', () => {
       this.checkLoggedIn();
-    });
       this.getLikes();
       this.getData();
+    });
       // this.getphoto();
   }
 
@@ -314,24 +314,25 @@ deleteReview = async (location_id, review_id) => {
           
           <Container>
             <Header>
+            <Left>
+            <Button transparent onPress={() => this.props.navigation.goBack()}>
+              <Icon name='arrow-back' />
+            </Button>
+              </Left>
+              <Body>
+              <Title style={{fontWeight:'bold', fontSize:20}}>{item_first.location_name}</Title>
+              <Subtitle>{item_first.location_town}</Subtitle>
+              </Body>
               <Right>
               <TouchableOpacity style={styles.appButtonContainer} onPress={() => this.props.navigation.navigate("AddReview", {id: this.state.params})}>
                     
-              <Text style={styles.appButtonText}> Add Review </Text>
+              <Text style={styles.appButtonText}> + </Text>
                 
               </TouchableOpacity>
               
               </Right>
            </Header>
                 <Card>
-                  <CardItem>
-                    <Left></Left>
-                      <Body>
-                        <Text >{item_first.location_name}</Text>
-                        <Text note>{item_first.location_town}</Text>
-                      </Body>
-                    <Right></Right>
-                  </CardItem>
 
                   <CardItem cardBody>
                     <Left>
@@ -358,34 +359,48 @@ deleteReview = async (location_id, review_id) => {
                     data = {item_first.location_reviews}
                     renderItem={({ item }) => (
                       <Card>
+                      <CardItem>
+                        <Left></Left>
+                        <Body>
+                        <Text style={styles.text, {fontWeight:'bold'}}>
+                          Overall Rating: {"\n"}
+                          {this.starRating(item.overall_rating)}
+                          </Text>
+                        </Body>
+                        <Right></Right>
+                        </CardItem>  
                     <CardItem>
                       <Left>
-                    <Text style={styles.text}>
-                     
-                      Overall Rating: {"\n"}
-                      {this.starRating(item.overall_rating)}
-                      {"\n"}
+
+                    <Text style={styles.textrating}>
 
                       Price Rating: {"\n"}
                       {this.starRating(item.price_rating)}
-                      {"\n"}
-
-                      Quality Rating: {"\n"}
-                      {this.starRating(item.quality_rating)}
-                      {"\n"}
-
-                      Clenliness Rating: {"\n"}
-                      {this.starRating(item.clenliness_rating)}
-                      {"\n"}
-                      {"\n"}
-                      Comment: {item.review_body}{"\n"}
                       </Text>
                       </Left>
+
                       <Body>
+                      <Text style={styles.textrating}>
+                      Quality Rating: {"\n"}
+                      {this.starRating(item.quality_rating)}
+                      </Text>
                       </Body>
+
                       <Right>
-                      {/* {this.renderFileUri()} */}
+                      <Text style={styles.textrating}>
+                      Clenliness Rating: {"\n"}
+                      {this.starRating(item.clenliness_rating)}
+                      </Text>
                       </Right>
+                      {/* {this.renderFileUri()} */}
+                     
+                    </CardItem>
+                    <CardItem cardBody>
+                      <Image source={{uri: 'https://picsum.photos/seed/picsum/200/300'}} style={{height: 200, width: null, flex: 1}}/>
+                    </CardItem>
+                    <CardItem>
+                    <Text style={styles.text}>
+                      Comment: {item.review_body}{"\n"}</Text>
                     </CardItem>
                     <CardItem>
                       <Left>
@@ -417,24 +432,23 @@ deleteReview = async (location_id, review_id) => {
         backgroundColor: 'black',
         paddingTop: 2,
       },
-      text: {
-        
+      textrating:{
+          fontSize: 12,
+          fontWeight:'bold'
       },
+
       container: {
         flex: 1,
         padding: 10,
       },  
       appButtonContainer: {
-        flex: 1,
+        width: 50,
         marginTop: 10,
-        elevation: 8,
+        elevation: 3,
         backgroundColor: "#009688",
         borderRadius: 10,
         padding: 5,
         margin: 10,
-        paddingVertical: 10,
-        paddingHorizontal: 12,
-
       },
       
       appButtonText: {

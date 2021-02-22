@@ -12,7 +12,13 @@ class Home extends Component{
     this.state = {
       token: '',
       id: '',
-      error: ''
+      error: '',
+      errorPassword: '',
+      errorEmail: '',
+      errorLength: '',
+      isValidEmail: true,
+      isValidPassword: true,
+      isNull: true
     };
   }
 

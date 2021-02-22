@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, ToastAndroid, FlatList, StyleSheet,SafeAreaView, StatusBar, Alert, Image } from 'react-native';
-import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right, Toast } from 'native-base';
+import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right, Title } from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StarRating from 'react-native-star-rating';
 
@@ -8,7 +8,6 @@ class Home extends Component{
 
   constructor(props){
     super(props);
-
     // the components state
     this.state = {
       isLoading: true,
@@ -201,7 +200,9 @@ getFavourite = async () => {
         
           return (
             <Container>
-              <Header />
+              <Header>
+              <Title style={{fontWeight:'bold', fontSize:20, alignSelf: 'center'}}>HOME</Title>
+              </Header>
               <FlatList
                 data={this.state.listData}
                 renderItem={({ item }) => (
