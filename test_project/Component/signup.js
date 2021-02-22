@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Text, TextInput, View, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { TextInput, View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { Container, Form, Content, Card, CardItem, Input, Text, Button, Icon, Left, Body, Right, Item } from 'native-base';
 
 
 class App extends Component {
@@ -10,7 +11,10 @@ class App extends Component {
       email: '',
       first_name: '',
       last_name: '',
-      password: ''
+      password: '',
+      isValidEmail: true,
+      isValidPassword: true,
+
     };
   }
 
@@ -61,6 +65,12 @@ class App extends Component {
   }
 
   handlePassword = (text) => {
+    if (text.length <  5 && text.length >  0){
+      this.setState({isValidEmail: false})
+    }
+     else{
+      this.setState({isValidEmail: true})
+    }
     this.setState({password: text})
   }
 
@@ -68,17 +78,35 @@ class App extends Component {
     this.setState({email: text})
   }
 
+
   render() {
+    const handleEmail = (val) => {
+      
+    
+  }
     return (
+      <Container>
       <View style={styles.container}>
-      <Text> First Name: </Text>
-      <TextInput style={styles.inputText} placeholder="Enter First Name" onChangeText={this.handleFirstname} value={this.state.first_name} />
-      <Text> Last Name: </Text>
-      <TextInput style={styles.inputText} placeholder="Enter Last Name" onChangeText={this.handleLastname} value={this.state.last_name} />
-      <Text> Email: </Text>
-      <TextInput style={styles.inputText} placeholder="Enter Email" onChangeText={this.handleEmail} value={this.state.email} />
-      <Text> Password: </Text>
-      <TextInput style={styles.inputText} placeholder="Enter Password" secureTextEntry={true} onChangeText={this.handlePassword} value={this.state.password} />
+
+      <Form style={{paddingLeft: 20, paddingRight:20}}>
+      <Item style={{marginTop:20}}>
+      
+      <Input style={styles.inputText} placeholder="Enter First Name" onChangeText={this.handleFirstname} value={this.state.first_name} />
+      </Item>
+      <Item style={{marginTop:20}}>
+
+      <Input style={styles.inputText} placeholder="Enter Last Name" onChangeText={this.handleLastname} value={this.state.last_name} />
+      </Item>
+      <Item style={{marginTop:20}}>
+
+      <Input style={styles.inputText} placeholder="Enter Email" onChangeText={this.handleEmail} value={this.state.email} onEndEditing={(e)=>handleEmail(e.nativeEvent.text)} />
+      </Item>
+      <Item style={{marginTop:20}}>
+
+      <Input style={styles.inputText} placeholder="Enter Password" secureTextEntry={true} onChangeText={this.handlePassword} value={this.state.password} />
+      </Item>
+      {this.state.isValidEmail ? null :
+      <Text style={{paddingLeft: 20, paddingRight:20, color:'red'}}>Password must be more than 5 charaters long!</Text>}
       
 
       <TouchableOpacity style={styles.appButtonContainer} onPress={() => this.signup()}>
@@ -86,7 +114,9 @@ class App extends Component {
       <Text style={styles.appButtonText}> Signup </Text>
         
       </TouchableOpacity>
+      </Form>
       </View>
+      </Container>
     );
   }
 }
@@ -97,6 +127,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   appButtonContainer: {
+    marginTop:20,
     elevation: 8,
     backgroundColor: "#009688",
     borderRadius: 10,

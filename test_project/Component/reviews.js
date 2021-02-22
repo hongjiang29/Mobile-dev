@@ -1,9 +1,9 @@
 
-import React, { Component } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { Component,} from 'react';
+import { View, FlatList, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
 import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Container, Header, Card, CardItem, Text, Button, Icon, Left, Body, Right } from 'native-base';
+import { Container, Header, Card, CardItem, Text, Button, Icon, Left, Body, Right} from 'native-base';
 
 class Reviews extends Component{
   constructor(props){
@@ -15,6 +15,8 @@ class Reviews extends Component{
         listData: '',
         likes: [],
         myReviews: [],
+        location_ids: [],
+        urls: [],
         params: props.route.params.id
     };
   }
@@ -22,9 +24,10 @@ class Reviews extends Component{
   componentDidMount() {
     this.unsubscribe = this.props.navigation.addListener('focus', () => {
       this.checkLoggedIn();
+    });
       this.getLikes();
       this.getData();
-    });
+      // this.getphoto();
   }
 
   componentWillUnmount() {
@@ -52,6 +55,7 @@ class Reviews extends Component{
         {
           var joined = this.state.likes.concat(review_id);
           this.setState({ likes: joined })
+          this.getData()
           Alert.alert("Liked!")
         }else if (res.status === 401){
           this.props.navigation.navigate("Login")
@@ -80,6 +84,7 @@ unLike = async (location_id, review_id) => {
           array.splice(index, 1);
           this.setState({likes: array});
       }
+        this.getData()
         Alert.alert("Unliked!")
       }else if (res.status === 401){
         this.props.navigation.navigate("Login")
@@ -117,21 +122,18 @@ unLike = async (location_id, review_id) => {
         const array_likes = [...this.state.likes];
         const array_reviews = [...this.state.myReviews];
         const myReviews = (responseJson.reviews);
-        console.log(responseJson)
 
         likes.forEach(element => {
           array_likes.push(element.review.review_id)
     })
-
         myReviews.forEach(element => {
           array_reviews.push(element.review.review_id)
     })
+        this.setState({
+          likes: array_likes,
+          myReviews:array_reviews
+        })
 
-    this.setState({
-      isLoading: false,
-      likes: array_likes,
-      myReviews:array_reviews
-    })
         })
 };
   
@@ -152,11 +154,64 @@ unLike = async (location_id, review_id) => {
         }
       })
       .then ((responseJson) => {
+        const array_id = [...this.state.location_ids]
+        const myReviews = (responseJson.location_reviews);
+        myReviews.forEach(element => {
+          array_id.push(element.review_id)
+    })
           this.setState({
-            listData: responseJson
+            location_ids: array_id,
+            listData: responseJson,
+            isLoading: false
           })
         })
 };
+
+// getphoto = async () => {
+//   const value = await AsyncStorage.getItem('token');
+//   let id = this.state.params;
+//   let reviews = this.state.location_ids;
+//   const array_photo = [];
+//   console.log(reviews)
+//   reviews.forEach(element => {
+//   return fetch("http://10.0.2.2:3333/api/1.0.0/location/"+id+"/review/"+element+"/photo",{
+//     method: "GET",
+//     headers: {
+//     'X-Authorization' : value
+//   },
+// })
+//     .then ((res) => {
+//       if (res.status === 200)
+//       {
+//         console.log('success')
+//         array_photo.push({[element]:res.url})
+//       }else if (res.status === 401){
+//         console.log('error')
+//       }
+//       else if (res.status === 404){
+//        console.log('missing')
+//        array_photo.push({[element]:''})
+
+//       } else{
+//         console.log('forbidden')
+//         array_photo.push({[element]:''})
+//       }
+//     })
+//   })
+//   this.setState({
+//     urls: array_photo,
+//   })
+
+//   }
+
+//   // review_id, loc_id
+//   renderFileUri() {
+//     console.log('hello')
+//     console.log(this.state.urls)
+//     // return <Image
+//     //     source={{ uri: response.url }}
+//     //     style={styles.images}/>
+//     }
 
 deleteReview = async (location_id, review_id) => {
   const value = await AsyncStorage.getItem('token');
@@ -170,12 +225,7 @@ deleteReview = async (location_id, review_id) => {
     .then ((res) => {
       if (res.status === 200)
       {
-        const array = [...this.state.myReviews]; // make a separate copy of the array
-        const index = array.indexOf(review_id)
-        if (index !== -1) {
-          array.splice(index, 1);
-          this.setState({myReviews: array});
-        }
+        this.getData()
         Alert.alert("Deleted!")
       }else if (res.status === 401){
         this.props.navigation.navigate("Review")
@@ -185,8 +235,6 @@ deleteReview = async (location_id, review_id) => {
       }
     })
 };
-
-
 
   checkLikes(review_id){
     if (this.state.likes.includes(review_id)) {
@@ -214,19 +262,19 @@ deleteReview = async (location_id, review_id) => {
               fullStarColor={'gold'}/>
   }
 
-  renderLikeButton = (review_id) => {
-    let bool = this.checkLikes(review_id)
+  renderLikeButton = (item) => {
+    let bool = this.checkLikes(item.review_id)
     let id = this.state.params;
     console.log(id)
     if (bool == true) {
-    return <Button transparent onPress={() => this.unLike(id, review_id)}>
+    return <Button transparent onPress={() => this.unLike(id, item.review_id)}>
             <Icon active name="thumbs-up" />
-            <Text>unlike</Text>
+            <Text>{item.likes}</Text>
           </Button>
   } else {
-    return <Button transparent onPress={() => this.like(id, review_id)}>
+    return <Button transparent onPress={() => this.like(id, item.review_id)}>
             <Icon active name="thumbs-up-outline" />
-            <Text>like</Text>
+            <Text>{item.likes}</Text>
           </Button>
   }
 }
@@ -260,9 +308,10 @@ deleteReview = async (location_id, review_id) => {
               </View>
             );
           } else{
-            const item = this.state.listData
-            const loc_id = item.location_id
+            const item_first = this.state.listData
+            const loc_id = item_first.location_id
         return (
+          
           <Container>
             <Header>
               <Right>
@@ -278,8 +327,8 @@ deleteReview = async (location_id, review_id) => {
                   <CardItem>
                     <Left></Left>
                       <Body>
-                        <Text >{item.location_name}</Text>
-                        <Text note>{item.location_town}</Text>
+                        <Text >{item_first.location_name}</Text>
+                        <Text note>{item_first.location_town}</Text>
                       </Body>
                     <Right></Right>
                   </CardItem>
@@ -288,28 +337,29 @@ deleteReview = async (location_id, review_id) => {
                     <Left>
                       <Text>
                       Price Rating:
-                      {this.starRating(item.avg_price_rating)}  
+                      {this.starRating(item_first.avg_price_rating)}  
                     </Text>
                     </Left>
                     <Body>
                       <Text>
                         Quality Rating:     
-                        {this.starRating(item.avg_quality_rating)}
+                        {this.starRating(item_first.avg_quality_rating)}
                       </Text>
                     </Body>
                     <Right>
                         <Text>Hygiene Rating:
-                        {this.starRating(item.avg_clenliness_rating)}
+                        {this.starRating(item_first.avg_clenliness_rating)}
                     </Text>
                     </Right>
                   </CardItem>
                     </Card>
                     <Text style={{left: 30,top: 5, fontWeight: "bold", paddingBottom:10}}>Reviews: </Text>
                     <FlatList
-                    data = {item.location_reviews}
+                    data = {item_first.location_reviews}
                     renderItem={({ item }) => (
                       <Card>
                     <CardItem>
+                      <Left>
                     <Text style={styles.text}>
                      
                       Overall Rating: {"\n"}
@@ -330,10 +380,16 @@ deleteReview = async (location_id, review_id) => {
                       {"\n"}
                       Comment: {item.review_body}{"\n"}
                       </Text>
+                      </Left>
+                      <Body>
+                      </Body>
+                      <Right>
+                      {/* {this.renderFileUri()} */}
+                      </Right>
                     </CardItem>
                     <CardItem>
                       <Left>
-                        {this.renderLikeButton(item.review_id)}
+                        {this.renderLikeButton(item)}
                       </Left>
                       <Body>
                       {this.renderDeleteButton(item.review_id)}
@@ -346,11 +402,7 @@ deleteReview = async (location_id, review_id) => {
                     )}
                     keyExtractor={(item,index) => item.review_id.toString()}
                     /> 
-
-               
-  
                 </Container>
-            
           );
         }
       }

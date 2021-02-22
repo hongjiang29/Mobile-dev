@@ -16,7 +16,6 @@ class Home extends Component{
 		catch (e)
 		{
 			console.log("DEBUG: Failed to get id: " + e);
-			this.props.navigation.navigate('Login');
 		}
 	}
 
@@ -47,14 +46,13 @@ class Home extends Component{
       if (res.status === 200)
       {
         this.deleteDetails()
-        this.props.navigation.navigate('Home');
+        this.props.navigation.navigate('Login');
         return;
       }else if (res.status === 400){
         throw 'Validation';
       }
       else{
-        Alert.alert('You are not logged in yet!')
-			  this.props.navigation.navigate('Login');
+        
         throw 'failed';
       };
     })

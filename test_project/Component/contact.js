@@ -19,6 +19,7 @@ class Home extends Component{
   componentDidMount() {
     this.unsubscribe = this.props.navigation.addListener('focus', () => {
       this.checkLoggedIn();
+      this.getphoto();
     });
   }
 
@@ -47,6 +48,29 @@ class Home extends Component{
 			this.props.navigation.navigate('Logout');
 		}
 	}
+
+  getphoto = async () => {
+    const value = await AsyncStorage.getItem('token');
+    return fetch("http://10.0.2.2:3333/api/1.0.0/location/2/review/52/photo",{
+      method: "GET",
+      headers: {
+      'X-Authorization' : value
+    },
+  })
+      .then ((res) => {
+        if (res.status === 200)
+        {
+          console.log(res);
+        }else if (res.status === 401){
+          ToastAndroid.show("Your're not logged in", ToastAndroid.SHORT)
+          this.props.navigation.navigate("Login")
+        }
+        else{
+          console.log(res);
+          throw 'failed';
+        }
+      })
+  }
 
     render(){
         return (

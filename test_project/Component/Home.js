@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, ToastAndroid, FlatList, StyleSheet,SafeAreaView, StatusBar, Alert, Image } from 'react-native';
-import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
+import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right, Toast } from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StarRating from 'react-native-star-rating';
 
@@ -50,7 +50,7 @@ class Home extends Component{
         {
           var joined = this.state.favouritePlaces.concat(location_id);
           this.setState({ favouritePlaces: joined })
-          Alert.alert("favourited!")
+          ToastAndroid.show('Favourited!', ToastAndroid.SHORT)
           return res.json();
         }else if (res.status === 401){
           this.props.navigation.navigate("Login")
@@ -82,8 +82,7 @@ unfavourite = async (location_id) => {
         this.setState({favouritePlaces: array});
       }
       console.log(this.state.favouritePlaces)
-      Alert.alert("Unfavourited!")
-        return res.json();
+      ToastAndroid.show('Unfavourited!', ToastAndroid.SHORT)
       }else if (res.status === 401){
         this.props.navigation.navigate("Login")
       }
