@@ -148,7 +148,7 @@ getData = async () => {
         if (res.status === 200)
         {
           Alert.alert("hello photo uploaded")
-          navigation.navigate('Review');
+          navigation.push('Review', {id: id});
         }else if (res.status === 400){
           throw 'Validation';
         }

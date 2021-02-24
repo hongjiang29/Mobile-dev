@@ -48,11 +48,14 @@ class EditReview extends Component {
     }
     if (response_url == false && photo == true){
       this.deletePhoto()
-    } else if (response_url != "" && photo == false){
+    } else if (this.state.file != ""){
       this.addPhoto()
     }
+    var Filter = require('bad-words'),
+    filter = new Filter();
+    filter.addWords('tea', 'cakes', 'pastries');
     console.log(overall_rating)
-    fetch("http://10.0.2.2:3333/api/1.0.0/location/"+location_id+"/review/"+review_id,
+    return fetch("http://10.0.2.2:3333/api/1.0.0/location/"+location_id+"/review/"+review_id,
       {
         method: 'patch',
         headers: {
@@ -64,14 +67,14 @@ class EditReview extends Component {
           price_rating: price_rating,
           quality_rating: quality_rating,
           clenliness_rating: clenliness_rating,
-          review_body: review_body
+          review_body: filter.clean(review_body)
         }),
 
       })
       .then ((res) => {
         if (res.status === 200)
         {
-          navigation.navigate('Review');
+          navigation.push('Review', {id: location_id});
           return res.json();
         }else if (res.status === 400){
           throw 'Validation';
@@ -91,7 +94,7 @@ class EditReview extends Component {
     let {location_id, review_id} = this.state;
     console.log(review_id)
     const Token = await AsyncStorage.getItem('token');
-    fetch("http://10.0.2.2:3333/api/1.0.0/location/"+location_id+"/review/"+review_id+"/photo",
+    return fetch("http://10.0.2.2:3333/api/1.0.0/location/"+location_id+"/review/"+review_id+"/photo",
       {
         method: 'post',
         headers: {
@@ -149,7 +152,7 @@ class EditReview extends Component {
       if (res.status === 200)
       {
         console.log('success')
-        this.setState({isloading: false, photo:true, response_url: res.url})
+        this.setState({isloading: false, photo:true, response_url: res.url+ "?time=" + new Date()})
         
       }else if (res.status === 401){
         console.log('error')

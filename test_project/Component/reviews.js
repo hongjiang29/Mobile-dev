@@ -8,6 +8,7 @@ import { Container, Header, Card, CardItem, Text, Button, Icon, Left, Body, Righ
 class Reviews extends Component{
   constructor(props){
     super(props);
+    
 
     // the components state
     this.state = {
@@ -16,18 +17,17 @@ class Reviews extends Component{
         likes: [],
         myReviews: [],
         location_ids: [],
-        urls: [],
+        photo: {},
+        boolPhoto: true,
         params: props.route.params.id
     };
   }
-
   componentDidMount() {
     this.unsubscribe = this.props.navigation.addListener('focus', () => {
       this.checkLoggedIn();
       this.getLikes();
       this.getData();
     });
-      // this.getphoto();
   }
 
   componentWillUnmount() {
@@ -53,9 +53,9 @@ class Reviews extends Component{
       .then ((res) => {
         if (res.status === 200)
         {
-          var joined = this.state.likes.concat(review_id);
-          this.setState({ likes: joined })
           this.getData()
+          var joined = this.state.likes.concat(review_id);
+          this.setState({boolPhoto: false, likes: joined })
           Alert.alert("Liked!")
         }else if (res.status === 401){
           this.props.navigation.navigate("Login")
@@ -78,13 +78,13 @@ unLike = async (location_id, review_id) => {
     .then ((res) => {
       if (res.status === 200)
       {
+        this.getData()
         const array = [...this.state.likes]; // make a separate copy of the array
         const index = array.indexOf(review_id)
         if (index !== -1) {
           array.splice(index, 1);
-          this.setState({likes: array});
+          this.setState({boolPhoto: false, likes: array});
       }
-        this.getData()
         Alert.alert("Unliked!")
       }else if (res.status === 401){
         this.props.navigation.navigate("Login")
@@ -162,56 +162,57 @@ unLike = async (location_id, review_id) => {
           this.setState({
             location_ids: array_id,
             listData: responseJson,
-            isLoading: false
           })
+          if(this.state.boolPhoto){
+          this.getphoto()}
         })
 };
 
-// getphoto = async () => {
-//   const value = await AsyncStorage.getItem('token');
-//   let id = this.state.params;
-//   let reviews = this.state.location_ids;
-//   const array_photo = [];
-//   console.log(reviews)
-//   reviews.forEach(element => {
-//   return fetch("http://10.0.2.2:3333/api/1.0.0/location/"+id+"/review/"+element+"/photo",{
-//     method: "GET",
-//     headers: {
-//     'X-Authorization' : value
-//   },
-// })
-//     .then ((res) => {
-//       if (res.status === 200)
-//       {
-//         console.log('success')
-//         array_photo.push({[element]:res.url})
-//       }else if (res.status === 401){
-//         console.log('error')
-//       }
-//       else if (res.status === 404){
-//        console.log('missing')
-//        array_photo.push({[element]:''})
+getphoto = async () => {
+  const value = await AsyncStorage.getItem('token');
+  let array = this.state.location_ids
+  let loc_id = this.state.params
+  let photos = {}
+  array.forEach(element => {
+  fetch("http://10.0.2.2:3333/api/1.0.0/location/"+loc_id+"/review/"+element+"/photo",{
+    method: "GET",
+    headers: {
+    'X-Authorization' : value
+  },
+})
+    .then ((res) => {
+      if (res.status === 200)
+      {
+        return res.url;
+      }else if (res.status === 401){
+        console.log('error')
+      }
+      else if (res.status === 404){
+       console.log('missing')
+      } else{
+        console.log('forbidden')
+      }
+    }).then((response) => {
+      if (typeof(response) === 'undefined') {
+        return false
+      }else{
+      console.log('success')
+      photos[element] = response+ "?time=" + new Date()}
+    })
+  })
+  this.setState({photo: photos,
+    isLoading: false}) 
+    
+  }
 
-//       } else{
-//         console.log('forbidden')
-//         array_photo.push({[element]:''})
-//       }
-//     })
-//   })
-//   this.setState({
-//     urls: array_photo,
-//   })
 
-//   }
-
-//   // review_id, loc_id
-//   renderFileUri() {
-//     console.log('hello')
-//     console.log(this.state.urls)
-//     // return <Image
-//     //     source={{ uri: response.url }}
-//     //     style={styles.images}/>
-//     }
+  renderFileUri (review_id) {
+    if (this.state.photo[review_id]){
+    return <Image source={{uri: this.state.photo[review_id]}} style={{height: 200, width: null, flex: 1}}/>}
+    else{
+      return <Image/>
+    }
+    }
 
 deleteReview = async (location_id, review_id) => {
   const value = await AsyncStorage.getItem('token');
@@ -265,7 +266,6 @@ deleteReview = async (location_id, review_id) => {
   renderLikeButton = (item) => {
     let bool = this.checkLikes(item.review_id)
     let id = this.state.params;
-    console.log(id)
     if (bool == true) {
     return <Button transparent onPress={() => this.unLike(id, item.review_id)}>
             <Icon active name="thumbs-up" />
@@ -298,7 +298,6 @@ deleteReview = async (location_id, review_id) => {
           </Button>
   }
   }
-
     render(){
         
         if (this.state.isLoading){
@@ -315,7 +314,7 @@ deleteReview = async (location_id, review_id) => {
           <Container>
             <Header>
             <Left>
-            <Button transparent onPress={() => this.props.navigation.goBack()}>
+            <Button transparent onPress={() => this.props.navigation.navigate('Home')}>
               <Icon name='arrow-back' />
             </Button>
               </Left>
@@ -392,11 +391,10 @@ deleteReview = async (location_id, review_id) => {
                       {this.starRating(item.clenliness_rating)}
                       </Text>
                       </Right>
-                      {/* {this.renderFileUri()} */}
-                     
+                      
                     </CardItem>
                     <CardItem cardBody>
-                      <Image source={{uri: 'https://picsum.photos/seed/picsum/200/300'}} style={{height: 200, width: null, flex: 1}}/>
+                      {this.renderFileUri(item.review_id)}
                     </CardItem>
                     <CardItem>
                     <Text style={styles.text}>
