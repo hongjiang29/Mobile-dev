@@ -49,9 +49,9 @@ class App extends Component{
                     if (route.name === 'Home') {
                         iconName = focused ? 'home' : 'home-outline';
                     } else if (route.name === 'Logout') {
-                        iconName = focused ? 'person' : 'person-outline';
+                        iconName = focused ? 'exit' : 'exit-outline';
                     }else if (route.name === 'Account') {
-                        iconName = focused ? 'send' : 'send-outline';
+                        iconName = focused ? 'person' : 'person-outline';
                 }
                 return <Ionicons name={iconName} size={size} color={color} />
                 },

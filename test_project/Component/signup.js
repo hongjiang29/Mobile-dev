@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TextInput, View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { TextInput, View, StyleSheet, Alert, TouchableOpacity, Image } from 'react-native';
 import { Container, Form, Header, Title, CardItem, Input, Text, Button, Icon, Left, Body, Right, Item } from 'native-base';
 
 
@@ -114,29 +114,36 @@ class App extends Component {
             </Button>
           </Left>
           <Body>
-        <Title style={{fontWeight:'bold', fontSize:20}}>SIGNUP</Title>
+        <Title style={{fontWeight:'bold', fontSize:20}}>Signup</Title>
         </Body>
         <Right></Right>
         </Header>
+      
+      <View  style={{alignItems: 'center', margin:20}}>
+
+      <Image source={require('../assets/sign-up.png')}
+      style={{width:150, height:170}}/>
+
+      </View>
 
       <View style={styles.container}>
 
       <Form style={{paddingLeft: 20, paddingRight:20}}>
-      <Item style={{marginTop:20}}>
+      <Item rounded style={{marginTop:20}}>
       
       <Input style={styles.inputText} placeholder="Enter First Name" onChangeText={this.handleFirstname} value={this.state.first_name} />
       </Item>
-      <Item style={{marginTop:20}}>
+      <Item rounded style={{marginTop:20}}>
 
       <Input style={styles.inputText} placeholder="Enter Last Name" onChangeText={this.handleLastname} value={this.state.last_name} />
       </Item>
-      <Item style={{marginTop:20}}>
+      <Item rounded style={{marginTop:20}}>
 
       <Input style={styles.inputText} placeholder="Enter Email" onChangeText={this.handleEmail} value={this.state.email} onEndEditing={(e)=>handleEmail(e.nativeEvent.text)} />
       </Item>
       {this.state.isValidEmail ? null :
       <Text style={{paddingLeft: 20, paddingRight:20, color:'red'}}>{this.state.errorEmail}</Text>}
-      <Item style={{marginTop:20}}>
+      <Item rounded style={{marginTop:20}}>
       <Input style={styles.inputText} placeholder="Enter Password" secureTextEntry={true} onChangeText={this.handlePassword} value={this.state.password} />
       </Item>
       {this.state.isValidPassword ? null :
@@ -157,10 +164,7 @@ class App extends Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 3,
-    padding: 24,
-  },
+
   appButtonContainer: {
     marginTop:20,
     elevation: 8,

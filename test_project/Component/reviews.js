@@ -1,6 +1,6 @@
 
 import React, { Component,} from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Alert, Image, ToastAndroid } from 'react-native';
 import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Container, Header, Card, CardItem, Text, Button, Icon, Left, Body, Right, Title, Subtitle} from 'native-base';
@@ -22,12 +22,14 @@ class Reviews extends Component{
         params: props.route.params.id
     };
   }
-  componentDidMount() {
+  async componentDidMount() {
     this.unsubscribe = this.props.navigation.addListener('focus', () => {
       this.checkLoggedIn();
-      this.getLikes();
-      this.getData();
-    });
+      
+    })
+     this.getLikes();
+     this.getData();
+
   }
 
   componentWillUnmount() {
@@ -56,7 +58,7 @@ class Reviews extends Component{
           this.getData()
           var joined = this.state.likes.concat(review_id);
           this.setState({boolPhoto: false, likes: joined })
-          Alert.alert("Liked!")
+          ToastAndroid.show('Liked!', ToastAndroid.SHORT)
         }else if (res.status === 401){
           this.props.navigation.navigate("Login")
         }
@@ -85,7 +87,7 @@ unLike = async (location_id, review_id) => {
           array.splice(index, 1);
           this.setState({boolPhoto: false, likes: array});
       }
-        Alert.alert("Unliked!")
+      ToastAndroid.show('Unliked!', ToastAndroid.SHORT)
       }else if (res.status === 401){
         this.props.navigation.navigate("Login")
       }
@@ -154,7 +156,7 @@ unLike = async (location_id, review_id) => {
         }
       })
       .then ((responseJson) => {
-        const array_id = [...this.state.location_ids]
+        const array_id = []
         const myReviews = (responseJson.location_reviews);
         myReviews.forEach(element => {
           array_id.push(element.review_id)
@@ -172,6 +174,7 @@ getphoto = async () => {
   const value = await AsyncStorage.getItem('token');
   let array = this.state.location_ids
   let loc_id = this.state.params
+  console.log(array) 
   let photos = {}
   array.forEach(element => {
   fetch("http://10.0.2.2:3333/api/1.0.0/location/"+loc_id+"/review/"+element+"/photo",{
@@ -200,13 +203,15 @@ getphoto = async () => {
       photos[element] = response+ "?time=" + new Date()}
     })
   })
+
   this.setState({photo: photos,
-    isLoading: false}) 
+    isLoading: false})
     
   }
 
 
   renderFileUri (review_id) {
+    console.log(this.state.photo) 
     if (this.state.photo[review_id]){
     return <Image source={{uri: this.state.photo[review_id]}} style={{height: 200, width: null, flex: 1}}/>}
     else{
@@ -226,6 +231,7 @@ deleteReview = async (location_id, review_id) => {
     .then ((res) => {
       if (res.status === 200)
       {
+        this.setState({boolPhoto: false})
         this.getData()
         Alert.alert("Deleted!")
       }else if (res.status === 401){
@@ -282,7 +288,7 @@ deleteReview = async (location_id, review_id) => {
   renderEditButton = (item, loc_id) => {
     let bool = this.checkReviews(item.review_id)
     if (bool == true) {
-    return <Button transparent onPress={() => this.props.navigation.navigate('EditReview', {review: item, loc_id: loc_id})}>
+    return <Button transparent onPress={() => this.props.navigation.push('EditReview', {review: item, loc_id: loc_id})}>
             <Icon active name="md-hammer" /> 
             <Text>Edit</Text>
           </Button>
@@ -323,7 +329,7 @@ deleteReview = async (location_id, review_id) => {
               <Subtitle>{item_first.location_town}</Subtitle>
               </Body>
               <Right>
-              <TouchableOpacity style={styles.appButtonContainer} onPress={() => this.props.navigation.navigate("AddReview", {id: this.state.params})}>
+              <TouchableOpacity activeOpacity={.7} style={styles.appButtonContainer} onPress={() => this.props.navigation.push("AddReview", {id: this.state.params})}>
                     
               <Text style={styles.appButtonText}> + </Text>
                 
@@ -442,19 +448,20 @@ deleteReview = async (location_id, review_id) => {
       appButtonContainer: {
         width: 50,
         marginTop: 10,
-        elevation: 3,
-        backgroundColor: "#009688",
-        borderRadius: 10,
         padding: 5,
         margin: 10,
+        borderColor:'black',
+        elevation: 8,
+        borderRadius: 10,
+        backgroundColor: 'green'
       },
       
       appButtonText: {
-        fontSize: 18,
+        fontSize: 20,
         color: "white",
         fontWeight: "bold",
         alignSelf: "center",
-        textTransform: "uppercase"
+        textTransform: "uppercase",
       },
     })
 

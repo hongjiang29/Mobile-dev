@@ -117,7 +117,7 @@ getData = async () => {
             console.log('hi2')
             this.getData()
           }else{
-          navigation.navigate('Review')}
+            navigation.push('Review', {id: id});}
         }else if (res.status === 400){
           throw 'Validation';
         }

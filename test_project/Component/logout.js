@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { View, Text, Button, Alert } from 'react-native';
+import { View, Alert, TouchableOpacity, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Container, Form, Header, Title, CardItem, Input, Text, Button, Icon, Left, Body, Right, Item } from 'native-base';
 
 class Home extends Component{
 
@@ -66,18 +67,60 @@ class Home extends Component{
         return (
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
               <Text>Do you really want to log out?</Text>
-              <Button
-                title="Yes"
-                onPress={() => this.logout()}/>   
+            <View style={styles.rowContainer}>
+            <TouchableOpacity style={styles.appRedButtonContainer} onPress={() => this.logout()}>
+              
+              <Text style={styles.appButtonText}> Yes </Text>
+                
+              </TouchableOpacity>
 
-                <Button
-                title="No"
-                onPress={() => navigation.navigate('Home')}/> 
+              <TouchableOpacity style={styles.appGreenButtonContainer} onPress={() => navigation.navigate('Home')}>
+              
+              <Text style={styles.appButtonText}> No </Text>
+              </TouchableOpacity>
+              </View>
             </View>
             
 
           );
         }
     }
+
+    const styles = StyleSheet.create({
+
+      rowContainer: {
+        flexDirection: 'row'
+      },
+
+      appGreenButtonContainer: {
+        margin:20,
+        elevation: 8,
+        backgroundColor: "#009688",
+        borderRadius: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 12
+        
+      },
+
+      appRedButtonContainer: {
+        margin:20,
+        elevation: 8,
+        backgroundColor: "red",
+        borderRadius: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 12
+        
+      },
+      
+      appButtonText: {
+        fontSize: 18,
+        color: "white",
+        fontWeight: "bold",
+        alignSelf: "center",
+        textTransform: "uppercase"
+      },
+      
+    
+    });
 
 export default Home

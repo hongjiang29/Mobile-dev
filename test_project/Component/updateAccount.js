@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, TextInput, Alert, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Image, Alert, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Container, Form, Content, Card, CardItem, Input, Text, Button, Icon, Left, Body, Right, Item } from 'native-base';
 
@@ -106,9 +106,13 @@ handleEmail = (text) => {
                       isValidEmail: false})}}
     return (
       <Container>
+      
+      <View  style={{alignItems: 'center', margin:20}}>
 
-      <View style={styles.container}>
+      <Image source={require('../assets/editAccount.png')}
+      style={{width:170, height:170}}/>
 
+      </View>
       <Form style={{paddingLeft: 20, paddingRight:20}}>
       <Item style={{marginTop:20}}>
         
@@ -162,21 +166,15 @@ handleEmail = (text) => {
         {this.state.isNull ? null :
         <Text style={{paddingLeft: 20, paddingRight:20, color:'red'}}>{this.state.errorLength}</Text>}
         </Form>
-      </View>
       </Container>
     );
   }
 }
 
-
-
 export default updateAccount
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 3,
-    padding: 24,
-  },
+ 
   appButtonContainer: {
     marginTop:20,
     elevation: 8,

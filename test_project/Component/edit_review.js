@@ -28,13 +28,8 @@ class EditReview extends Component {
   }
 
   componentDidMount() {
-    this.unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.getphoto();
-    });
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe();
+    this.getphoto();
+   
   }
 
   editreview = async () => {
@@ -46,9 +41,12 @@ class EditReview extends Component {
                      isNull: false})
       return false
     }
+
     if (response_url == false && photo == true){
       this.deletePhoto()
-    } else if (this.state.file != ""){
+    } else if (response_url && photo == false){
+      console.log(this.state.file)
+      console.log('helloooooooo')
       this.addPhoto()
     }
     var Filter = require('bad-words'),
@@ -188,7 +186,8 @@ class EditReview extends Component {
         console.log('response', JSON.stringify(response.uri));
         this.setState({
           file: response,
-          response_url: response.uri
+          response_url: response.uri,
+          photo:false
         });
       }
     });
