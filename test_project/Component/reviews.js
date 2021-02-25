@@ -1,9 +1,9 @@
 
 import React, { Component,} from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Alert, Image, ToastAndroid } from 'react-native';
+import {             View,             FlatList, StyleSheet, TouchableOpacity, Alert, Image, ToastAndroid } from 'react-native';
 import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Container, Header, Card, CardItem, Text, Button, Icon, Left, Body, Right, Title, Subtitle} from 'native-base';
+import { Container, Header, Card, CardItem, Text, Button, Icon, Left, Body, Right, Title, Subtitle, Item} from 'native-base';
 
 class Reviews extends Component{
   constructor(props){
@@ -233,7 +233,7 @@ deleteReview = async (location_id, review_id) => {
       {
         this.setState({boolPhoto: false})
         this.getData()
-        Alert.alert("Deleted!")
+        ToastAndroid.show("Review Deleted!", ToastAndroid.SHORT)
       }else if (res.status === 401){
         this.props.navigation.navigate("Review")
       }
@@ -338,8 +338,8 @@ deleteReview = async (location_id, review_id) => {
               </Right>
            </Header>
                 <Card>
-
-                  <CardItem cardBody>
+                  <CardItem>
+                    <Item>
                     <Left>
                       <Text>
                       Price Rating:
@@ -357,6 +357,7 @@ deleteReview = async (location_id, review_id) => {
                         {this.starRating(item_first.avg_clenliness_rating)}
                     </Text>
                     </Right>
+                    </Item>
                   </CardItem>
                     </Card>
                     <Text style={{left: 30,top: 5, fontWeight: "bold", paddingBottom:10}}>Reviews: </Text>
