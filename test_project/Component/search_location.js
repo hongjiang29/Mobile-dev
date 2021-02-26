@@ -203,7 +203,6 @@ class searchLocation extends Component {
     render() {
         if (this.state.isLoading) {
           return (
-  
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
               <Spinner color='black' />  
             </View>
@@ -213,7 +212,10 @@ class searchLocation extends Component {
                 <Container>
                   <Header searchBar rounded>
                     <Item>
-                      <TouchableOpacity onPress={() => this.search()}>
+                      <TouchableOpacity 
+                      accessibilityHint='Press to search your string or filter'
+                       onPress={() => this.search()}
+                      >
                       <Icon name="ios-search" />
                       </TouchableOpacity>
                       <Input 
@@ -221,9 +223,6 @@ class searchLocation extends Component {
                       value={this.state.search} 
                       />
                     </Item>
-                    <Button transparent>
-                      <Text>Search</Text>
-                    </Button>
                   </Header>
                   <CardItem>
                     <Item>
@@ -231,12 +230,14 @@ class searchLocation extends Component {
                       <View style={search.rowContainer}>
                     <TouchableOpacity 
                       activeOpacity={0.7} style={search.appButtonContainer} 
-                      onPress={() => this.geolocation()}
+                      accessibilityHint='Press to find the closest coffee shop' onPress={() => 
+                      this.geolocation()}
                     >
                     <Text style={main.appButtonText}> Find the nearest</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity 
+                      accessibilityHint='Click here to pull up the filter options'
                       activeOpacity={0.7} style={search.appButtonContainer} 
                       onPress={() => { this.setState({ show: true }); }}
                     >
@@ -257,7 +258,8 @@ class searchLocation extends Component {
                       borderRadius: 10 }}
                       >
                       <Item rounded style={{ marginTop: 20, backgroundColor: 'white' }}>
-                      <Input 
+                      <Input
+                        accessibilityLabel='Enter Overall Rating of values between 1 and 5'
                         placeholder="Overall Rating 1-5" 
                         onChangeText={this.handleOverall} maxLength={1} 
                         value={this.state.overallRating} 
@@ -265,6 +267,7 @@ class searchLocation extends Component {
                       </Item>
                       <Item rounded style={{ marginTop: 20, backgroundColor: 'white' }}>
                       <Input 
+                        accessibilityLabel='Enter Price Rating of values between 1 and 5'
                         placeholder="Price Rating 1-5" 
                         onChangeText={this.handlePrice} maxLength={1} 
                         value={this.state.priceRating} 
@@ -272,6 +275,7 @@ class searchLocation extends Component {
                       </Item>
                       <Item rounded style={{ marginTop: 20, backgroundColor: 'white' }}>
                       <Input 
+                        accessibilityLabel='Enter Quality Rating of values between 1 and 5'
                         placeholder="Quality Rating 1-5" 
                         onChangeText={this.handleQuality} maxLength={1} 
                         value={this.state.qualityRating} 
@@ -280,6 +284,7 @@ class searchLocation extends Component {
 
                       <Item rounded style={{ marginTop: 20, backgroundColor: 'white' }}>
                       <Input 
+                        accessibilityLabel='Enter Clenliness of values between 1 and 5'
                         placeholder="Clenliness Rating 1-5" 
                         onChangeText={this.handleClenliness} maxLength={1} 
                         value={this.state.clenlinessRating} 
@@ -287,6 +292,7 @@ class searchLocation extends Component {
                       </Item>
                 
                       <DropDownPicker
+                        accessibilityLabel='pick your favourites or reviewed places'
                         items={[
                             { label: 'None', value: '' },
                             { label: 'Favourites', value: 'favourite' },
@@ -305,6 +311,7 @@ class searchLocation extends Component {
                       />
                       
                       <TouchableOpacity 
+                      accessible
                       activeOpacity={0.7} style={search.appButtonCloseContainer} 
                       onPress={() => { this.setState({ show: false }); }}
                       > 
@@ -321,6 +328,7 @@ class searchLocation extends Component {
                 data={this.state.list}
                 renderItem={({ item }) => (
                   <TouchableOpacity
+                  accessibilityHint='Click here to select a review'
                   onPress={() => this.props.navigation.navigate('Review', { id: item.location_id })}
                   >
                   <Content>

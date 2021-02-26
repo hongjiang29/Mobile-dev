@@ -129,14 +129,16 @@ handleEmail = (text) => {
       
       <Item rounded style={{ marginTop: 20 }}>
         <Input
+          accessibilityLabel='Enter your new First Name'
           underlineColorAndroid="transparent"
-          placeholder="Enter your new given name here"
+          placeholder="Enter your new first name here"
           autoCapitalize="none"
           onChangeText={this.handleFirstname} value={this.state.firstName}
         /></Item>
         
         <Item rounded style={{ marginTop: 20 }}>
         <Input
+          accessibilityLabel='Enter your new Last Name'
           underlineColorAndroid="transparent"
           placeholder="Enter your last name here"
           autoCapitalize="none"
@@ -145,6 +147,7 @@ handleEmail = (text) => {
 
         <Item rounded style={{ marginTop: 20 }}>
         <Input
+          accessibilityLabel='Enter your new Email'
           underlineColorAndroid="transparent"
           placeholder="Enter your new email here"
           autoCapitalize="none"
@@ -158,6 +161,7 @@ handleEmail = (text) => {
 
         <Item rounded style={{ marginTop: 20 }}>
         <Input
+          accessibilityLabel='Enter your new Password'
           underlineColorAndroid="transparent"
           placeholder="Enter your new password here"
           autoCapitalize="none"
@@ -173,6 +177,7 @@ handleEmail = (text) => {
                     {this.state.errorLength}</Text>}
 
         <TouchableOpacity
+          accessible 
           style={main.appButtonContainer}
           onPress={() => this.editAccount()}
         >

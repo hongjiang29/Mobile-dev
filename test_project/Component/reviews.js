@@ -412,7 +412,10 @@ deleteReview = async (locationId, reviewId) => {
                       <View>
                     <Text style={review.text}>
                       Comment: {item.review_body}{'\n'}</Text>
-                      <TouchableOpacity onPress={() => this.speechToText(item.review_body)}>
+                      <TouchableOpacity 
+                      accessibilityHint='Press this to listen to the review body' 
+                      onPress={() => this.speechToText(item.review_body)}
+                      >
                       <Icon active name="volume-high-outline" />
                       </TouchableOpacity>
                       </View>

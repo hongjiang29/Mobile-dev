@@ -110,7 +110,10 @@ class App extends Component {
       <Container>
         <Header>
         <Left>
-            <Button transparent onPress={() => this.props.navigation.goBack()}>
+            <Button 
+            accessibilityHint='Click here to go back to the login screen' 
+            transparent onPress={() => this.props.navigation.goBack()}
+            >
               <Icon name='arrow-back' />
             </Button>
           </Left>
@@ -133,7 +136,8 @@ class App extends Component {
       <Form style={{ paddingLeft: 20, paddingRight: 20 }}>
       <Item rounded style={{ marginTop: 20 }}>
       
-      <Input 
+      <Input
+        accessibilityLabel='Enter First Name'
         placeholder="Enter First Name" 
         onChangeText={this.handleFirstname} value={this.state.firstName} 
       />
@@ -141,6 +145,7 @@ class App extends Component {
       <Item rounded style={{ marginTop: 20 }}>
 
       <Input 
+        accessibilityLabel='Enter Last Name'
         placeholder="Enter Last Name" 
         onChangeText={this.handleLastname} value={this.state.lastName} 
       />
@@ -148,6 +153,7 @@ class App extends Component {
       <Item rounded style={{ marginTop: 20 }}>
 
       <Input 
+        accessibilityLabel='Enter your Email'
         placeholder="Enter Email" onChangeText={this.handleEmail} 
         value={this.state.email} onEndEditing={(e) => handleEmail(e.nativeEvent.text)} 
       />
@@ -157,6 +163,7 @@ class App extends Component {
                   {this.state.errorEmail}</Text>}
       <Item rounded style={{ marginTop: 20 }}>
       <Input 
+        accessibilityLabel='Enter your password'
         placeholder="Enter Password" 
         secureTextEntry onChangeText={this.handlePassword} value={this.state.password} 
       />
@@ -168,7 +175,7 @@ class App extends Component {
       <Text style={{ paddingLeft: 20, paddingRight: 20, color: 'red' }}>
                   {this.state.errorLength}</Text>}
 
-      <TouchableOpacity style={main.appButtonContainer} onPress={() => this.signup()}>
+      <TouchableOpacity accessible style={main.appButtonContainer} onPress={() => this.signup()}>
       
       <Text style={main.appButtonText}> Signup </Text>
         
