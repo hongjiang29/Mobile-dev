@@ -42,7 +42,6 @@ class Reviews extends Component {
     const value = await AsyncStorage.getItem('token');
     const array = this.state.location_ids;
     const locId = this.state.params;
-    console.log(array);
     const photos = {};
     array.forEach(element => {
     fetch(`http://10.0.2.2:3333/api/1.0.0/location/${locId}/review/${element}/photo`, {
@@ -56,7 +55,7 @@ class Reviews extends Component {
         } else if (res.status === 401) {
           console.log('error');
         } else if (res.status === 404) {
-         console.log('missing');
+         console.log('No Image');
         } else {
           console.log('forbidden');
         }
@@ -74,7 +73,6 @@ class Reviews extends Component {
 
     getData = async () => {
       const id = this.state.params;
-      console.log(id);
       return fetch(`http://10.0.2.2:3333/api/1.0.0/location/${id}`)
         .then((res) => {
           if (res.status === 200) {
@@ -113,7 +111,6 @@ class Reviews extends Component {
   })
       .then((res) => {
         if (res.status === 200) {
-          console.log('getlikes');
           return res.json();
         } else if (res.status === 401) {
           ToastAndroid.show("Your're not logged in", ToastAndroid.SHORT);
@@ -247,7 +244,6 @@ deleteReview = async (locationId, reviewId) => {
   }
 
   renderFileUri(reviewId) {
-    console.log(this.state.photo);
     if (this.state.photo[reviewId]) {
       return (<Image 
       source={{ uri: this.state.photo[reviewId] }} 
@@ -260,12 +256,18 @@ deleteReview = async (locationId, reviewId) => {
     const bool = this.checkLikes(item.review_id);
     const id = this.state.params;
     if (bool === true) {
-    return (<Button transparent onPress={() => this.unLike(id, item.review_id)}>
+    return (<Button 
+             accessibilityHint='Press to unike' transparent onPress={() => 
+             this.unLike(id, item.review_id)}
+    >
             <Icon active name="thumbs-up" />
             <Text>{item.likes}</Text>
           </Button>);
   } 
-    return (<Button transparent onPress={() => this.like(id, item.review_id)}>
+    return (<Button 
+             accessibilityHint='Press to like' transparent onPress={() => 
+             this.like(id, item.review_id)}
+    >
             <Icon active name="thumbs-up-outline" />
             <Text>{item.likes}</Text>
           </Button>);
@@ -275,7 +277,8 @@ deleteReview = async (locationId, reviewId) => {
     const bool = this.checkReviews(item.review_id);
     if (bool === true) {
     return (<Button 
-            transparent onPress={() => this.props.navigation.push('EditReview', 
+            accessibilityHint='Press to edit this review' transparent onPress={() => 
+            this.props.navigation.push('EditReview', 
             { review: item, loc_id: locId })}
     >
             <Icon active name="md-hammer" /> 
@@ -288,7 +291,10 @@ deleteReview = async (locationId, reviewId) => {
     const bool = this.checkReviews(reviewId);
     const id = this.state.params;
     if (bool === true) {
-    return (<Button rounded danger onPress={() => this.deleteReview(id, reviewId)}>
+    return (<Button 
+            accessibilityHint='Press to delete this review' rounded danger 
+            onPress={() => this.deleteReview(id, reviewId)}
+    >
             <Text>Delete</Text>
           </Button>);
   }
@@ -308,7 +314,10 @@ deleteReview = async (locationId, reviewId) => {
           <Container>
             <Header>
             <Left>
-            <Button transparent onPress={() => this.props.navigation.navigate('Home')}>
+            <Button 
+            accessibilityHint='Press to return to the home page' transparent onPress={() => 
+            this.props.navigation.navigate('Home')}
+            >
               <Icon name='arrow-back' />
             </Button>
               </Left>
@@ -318,7 +327,7 @@ deleteReview = async (locationId, reviewId) => {
               </Body>
               <Right>
               <TouchableOpacity 
-              activeOpacity={0.7} style={main.appButtonContainer} onPress={() => 
+              accessible activeOpacity={0.7} style={main.appButtonContainer} onPress={() => 
               this.props.navigation.push('AddReview', { id: this.state.params })}
               >    
               <Icon active name="pencil-outline" />

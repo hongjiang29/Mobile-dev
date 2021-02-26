@@ -74,12 +74,10 @@ class EditReview extends Component {
     if (responseUrl === false && photo === true) {
       this.deletePhoto();
     } else if (responseUrl && photo === false) {
-      console.log(this.state.file);
       this.addPhoto();
     }
     const filter = new Filter();
     filter.addWords('tea', 'cakes', 'pastries');
-    console.log(overallRating);
     return fetch(`http://10.0.2.2:3333/api/1.0.0/location/${locationId}/review/${reviewId}`,
       {
         method: 'patch',
@@ -116,7 +114,6 @@ class EditReview extends Component {
 
   addPhoto = async () => {
     const { locationId, reviewId } = this.state;
-    console.log(reviewId);
     const Token = await AsyncStorage.getItem('token');
     return fetch(`http://10.0.2.2:3333/api/1.0.0/location/${locationId}/review/${reviewId}/photo`,
       {
@@ -129,7 +126,7 @@ class EditReview extends Component {
         })
       .then((res) => {
         if (res.status === 200) {
-          ToastAndroid.show('Photo Uploaded!', ToastAndroid.SHORT);
+          console.log('Photo Uploaded!');
         } else if (res.status === 400) {
           throw Error;
         } else {
@@ -232,7 +229,7 @@ class EditReview extends Component {
         source={{ uri: this.state.responseUrl }}
         style={main.images}
       />
-        <TouchableOpacity style={editReview.close} onPress={() => this.removeImage()}>
+        <TouchableOpacity accessible style={editReview.close} onPress={() => this.removeImage()}>
         <Icon name="ios-close-circle" size={25} />
         </TouchableOpacity>
       </View>);
@@ -253,7 +250,10 @@ class EditReview extends Component {
         <Content>
       <Header>
         <Left>
-            <Button transparent onPress={() => this.props.navigation.goBack()}>
+            <Button 
+            accessibilityHint='Click here to return to the reviews list' 
+            transparent onPress={() => this.props.navigation.goBack()}
+            >
               <Icon name='arrow-back' />
             </Button>
           </Left>
@@ -318,6 +318,7 @@ class EditReview extends Component {
             </Item>
             <Item>
             <Input
+                accessibilityLabel='Edit the existing review body'
                 placeholder="Review away..."
                 multiline
                 onChangeText={(value) => this.handleBody(value)}
@@ -328,13 +329,17 @@ class EditReview extends Component {
               {this.state.errorLength}</Text>}
         
 
-      <TouchableOpacity style={main.appButtonContainer} onPress={() => this.editreview()}>
+      <TouchableOpacity 
+      accessible style={main.appButtonContainer} onPress={() => this.editreview()}
+      >
       
       <Text style={main.appButtonText}> Edit </Text>
         
       </TouchableOpacity>
 
-      <TouchableOpacity style={main.appButtonContainer} onPress={() => this.cameraLaunch()}>
+      <TouchableOpacity
+      accessible style={main.appButtonContainer} onPress={() => this.cameraLaunch()}
+      >
         <Text style={main.appButtonText}> Take a New Photo </Text>
       </TouchableOpacity>
       <View>

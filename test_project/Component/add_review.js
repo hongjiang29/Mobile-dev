@@ -189,9 +189,9 @@ cameraLaunch = () => {
         source={{ uri: this.state.fileUri }}
         style={main.images}
       />
-        <TouchableOpacity style={main.appDeleteContainer} onPress={() => this.removeImage()}>
-        <Text style={main.appButtonText}> X </Text>
-      </TouchableOpacity>
+      <TouchableOpacity accessible style={main.close} onPress={() => this.removeImage()}>
+        <Icon name="ios-close-circle" size={25} />
+        </TouchableOpacity>
       </View>);
     } 
       return (<Image
@@ -206,7 +206,7 @@ cameraLaunch = () => {
       <Container>
         <Header>
             <Left>
-            <Button transparent onPress={() => this.props.navigation.goBack()}>
+            <Button accessibilityHint='Click here to back to reviews' transparent onPress={() => this.props.navigation.goBack()}>
               <Icon name='arrow-back' />
             </Button>
               </Left>
@@ -271,6 +271,7 @@ cameraLaunch = () => {
             </Text></Item>
             <Item>
             <Input
+                accessibilityLabel='Write a review here'
                 placeholder="Review away..."
                 multiline
                 value={this.state.reviewBody}
@@ -280,14 +281,15 @@ cameraLaunch = () => {
             <Text style={{ paddingLeft: 20, paddingRight: 20, color: 'red' }}>
             {this.state.errorLength}</Text>}
                 
-      <TouchableOpacity style={main.appButtonContainer} onPress={() => this.addreview()}>
+      <TouchableOpacity accessible style={main.appButtonContainer} onPress={() => this.addreview()}>
       
       <Text style={main.appButtonText}> Add </Text>
         
       </TouchableOpacity>
 
-      <TouchableOpacity style={main.appButtonContainer} onPress={() => this.cameraLaunch()}>
-      
+      <TouchableOpacity 
+      accessible style={main.appButtonContainer} onPress={() => this.cameraLaunch()}
+      >
       <Text style={main.appButtonText}> Take a Photo </Text>
         
       </TouchableOpacity>

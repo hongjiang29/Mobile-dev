@@ -135,33 +135,42 @@ class App extends Component {
       </View>
       <Form style={{ paddingLeft: 20, paddingRight: 20 }}>
       <Item rounded style={{ marginTop: 20, backgroundColor: 'white' }}>
-      <Input placeholder="Enter Email" onChangeText={this.handleEmail} value={this.state.email} />
+      <Input 
+      accessibilityLabel='Please insert your Email' placeholder="Enter Email" 
+      onChangeText={this.handleEmail} value={this.state.email} 
+      />
       </Item>
       <Item rounded style={{ marginTop: 20, backgroundColor: 'white' }}>
       <Input 
-      placeholder="Enter Password" secureTextEntry onChangeText={this.handlePassword}
-      value={this.state.password} 
+      accessibilityLabel='Please insert your Password' placeholder="Enter Password" secureTextEntry 
+      onChangeText={this.handlePassword} value={this.state.password} 
       />
       </Item>
 
       {this.state.isNull ? null :
-      <Text style={{ paddingLeft: 20, paddingRight: 20, color: 'red' }}>
-                  {this.state.errorLength}</Text>
+      <Text 
+      style={{ 
+        paddingLeft: 20, 
+        paddingRight: 20, 
+        fontWeight: 'bold', 
+        fontSize: 18, 
+        color: 'red' }}
+      >
+      {this.state.errorLength}</Text>
       } 
-      <TouchableOpacity style={login.appButtonContainer} onPress={() => this.login()}>
+      <TouchableOpacity 
+      accessible style={login.appButtonContainer} onPress={() => this.login()} 
+      >
       
       <Text style={main.appButtonText}> Login </Text>
         
       </TouchableOpacity>
 
       <TouchableOpacity 
-      style={login.appButtonContainer} onPress={() => navigation.navigate('Signup')} 
+      accessible style={login.appButtonContainer} onPress={() => navigation.navigate('Signup')} 
       >
-      
       <Text style={main.appButtonText}> Signup </Text>
-        
       </TouchableOpacity>
-  
       </Form>
       </ImageBackground>
       </Container>

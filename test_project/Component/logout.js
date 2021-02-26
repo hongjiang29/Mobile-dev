@@ -53,14 +53,16 @@ class Home extends Component {
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
               <Text>Do you really want to log out?</Text>
             <View style={logout.rowContainer}>
-            <TouchableOpacity style={logout.appRedButtonContainer} onPress={() => this.logout()}>
-              
+            <TouchableOpacity 
+            accessible style={logout.appRedButtonContainer} onPress={() => this.logout()}
+            >
               <Text style={main.appButtonText}> Yes </Text>
                 
               </TouchableOpacity>
 
               <TouchableOpacity 
-              style={logout.appGreenButtonContainer} onPress={() => navigation.navigate('Home')}
+              accessible style={logout.appGreenButtonContainer} 
+              onPress={() => navigation.navigate('Home')}
               >
               <Text style={main.appButtonText}> No </Text>
               </TouchableOpacity>

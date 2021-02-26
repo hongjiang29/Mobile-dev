@@ -61,7 +61,6 @@ class Home extends Component {
             favouritePlaces: [...this.state.favouritePlaces, element.location_id]
         });
     });
-    console.log(this.state.favouritePlaces);
         }).catch((message) => { console.log(`error ${message}`); });
       }
 
@@ -105,7 +104,6 @@ class Home extends Component {
           const joined = this.state.favouritePlaces.concat(locationId);
           this.setState({ favouritePlaces: joined });
           ToastAndroid.show('Favourited!', ToastAndroid.SHORT);
-          return res.json();
         } else if (res.status === 401) {
           this.props.navigation.navigate('Login');
         } else {
@@ -131,16 +129,13 @@ unfavourite = async (locationId) => {
         array.splice(index, 1);
         this.setState({ favouritePlaces: array });
       }
-      console.log(this.state.favouritePlaces);
       ToastAndroid.show('Unfavourited!', ToastAndroid.SHORT);
       } else if (res.status === 401) {
         this.props.navigation.navigate('Login');
       } else {
         throw Error;
       }
-    }).then((responseJson) => {
-      console.log(responseJson);
-      }).catch((message) => { console.log(`error ${message}`); });
+    }).catch((message) => { console.log(`error ${message}`); });
 };
 
 
@@ -152,7 +147,6 @@ checkLoggedIn = async () => {
 }
 
 checkFavourite(locationId) {
-  console.log(locationId);
   if (this.state.favouritePlaces.includes(locationId)) {
     return true;
   } 
@@ -162,14 +156,19 @@ checkFavourite(locationId) {
 
   renderAuthButton = (locationId) => {
     const bool = this.checkFavourite(locationId);
-    console.log(bool);
     if (bool === true) {
-    return (<Button transparent onPress={() => this.unfavourite(locationId)}>
+    return (<Button 
+      accessibilityHint='Click here to Unfavourite' transparent onPress={() => 
+      this.unfavourite(locationId)}
+    >
             <Icon active name="heart" />
             <Text>UnFavourite</Text>
           </Button>);
   } 
-    return (<Button transparent onPress={() => this.favourite(locationId)}>
+    return (<Button 
+            accessibilityHint='Click here to Favourite' transparent onPress={() => 
+            this.favourite(locationId)}
+    >
             <Icon active name="heart-outline" />
             <Text>Favourite</Text>
           </Button>);
@@ -191,9 +190,9 @@ checkFavourite(locationId) {
               <FlatList
                 data={this.state.listData}
                 renderItem={({ item }) => (
-                  <TouchableOpacity
-                  onPress={() => this.props.navigation.navigate('Review', 
-                                                                { id: item.location_id })}
+                  <TouchableOpacity 
+                  accessible onPress={() => this.props.navigation.navigate('Review', 
+                                    { id: item.location_id })}
                   >
                   <Content>
                   <Card>

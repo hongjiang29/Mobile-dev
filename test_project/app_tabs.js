@@ -1,5 +1,5 @@
+// Common imports to allow packages
 import 'react-native-gesture-handler';
-
 import React, { Component } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -7,6 +7,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+// Screen imports
 import Login from './Component/Login';
 import Home from './Component/Home';
 import Signup from './Component/signup';
@@ -17,9 +18,10 @@ import AddReview from './Component/add_review';
 import EditReview from './Component/edit_review';
 import Search from './Component/search_location';
 
-
+// initialising navigator
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+
 class App extends Component {
   render() {
     return (

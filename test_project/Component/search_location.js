@@ -2,12 +2,13 @@
 /* eslint-disable no-undef */
 import React, { Component } from 'react';
 import { View, TouchableOpacity, ToastAndroid, FlatList, 
-         PermissionsAndroid, Image } from 'react-native';
+         PermissionsAndroid, Image, Modal } from 'react-native';
 import { Container, Header, Input, Card, CardItem, Item, Text, Button, Icon, 
          Left, Body, Right, Content, Thumbnail, Spinner } from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StarRating from 'react-native-star-rating';
 import Geolocation from '@react-native-community/geolocation';
+import DropDownPicker from 'react-native-dropdown-picker';
 import { search, main } from '../css/styles';
 
 class searchLocation extends Component {
@@ -22,7 +23,13 @@ class searchLocation extends Component {
       list: [],
       latitude: '',
       longitude: '',
-      locationPermission: false
+      locationPermission: false,
+      show: false,
+      overallRating: '',
+      priceRating: '',
+      qualityRating: '',
+      clenlinessRating: '',
+      search_in: ''
     };
   }
 
@@ -101,7 +108,6 @@ class searchLocation extends Component {
           return distance(origLat, origLong, b.latitude, b.longitude) -
           distance(origLat, origLong, a.latitude, a.longitude);
         });
-      // console.log(position.coords.latitude);
       this.setState({ list: arrayData });
       }
     }
@@ -120,6 +126,30 @@ class searchLocation extends Component {
       }
     }
 
+    handleSearch = (text) => {
+      this.setState({ search: text });
+    }
+
+    handleOverall = (text) => {
+      this.setState({ overallRating: text });
+    }
+
+    handlePrice = (text) => {
+      this.setState({ priceRating: text });
+    }
+
+    handleQuality = (text) => {
+      this.setState({ qualityRating: text });
+    }
+
+    handleClenliness = (text) => {
+      this.setState({ clenlinessRating: text });
+    }
+
+    handleSearchIn = (text) => {
+      this.setState({ search_in: text });
+    }
+
     checkLoggedIn = async () => {
       const value = await AsyncStorage.getItem('token');
       if (value == null) {
@@ -127,28 +157,48 @@ class searchLocation extends Component {
       }
     }
 
-
-    search = (text) => {
-        const arrayData = this.state.listData;
-        const arrayholder = this.state.list;
-        let array = [];
-        console.log(text);
-
-        if (text !== '') {
-          console.log('true');
-        arrayholder.forEach(element => {
-            if (element.location_name.toLowerCase().includes(text) || 
-               element.location_town.toLowerCase().includes(text)) {
-                array.push(element);
-                console.log('true');
-            } 
-            });
+    search = async () => {
+      const value = await AsyncStorage.getItem('token');
+      const searchObject = this.state.search;
+      let url = `http://10.0.2.2:3333/api/1.0.0/find?q=${searchObject}`;
+      if (this.state.overallRating) {
+        url = `${url}&overall_rating=${this.state.overallRating}`;
+      } 
+      if (this.state.priceRating) {
+        url = `${url}&price_rating=${this.state.priceRating}`;
+      }
+      if (this.state.qualityRating) {
+        url = `${url}&quality_rating=${this.state.qualityRating}`;
+      }
+      if (this.state.clenlinessRating) {
+        url = `${url}&clenliness_rating=${this.state.clenlinessRating}`;
+      }
+      if (this.state.search_in) {
+        url = `${url}&search_in=${this.state.search_in}`;
+      }
+      return fetch(url, 
+      {
+        headers: {
+          'X-Authorization': value
+        },
+      })
+        .then((res) => {
+          if (res.status === 200) {
+            return res.json();
+          } else if (res.status === 401) {
+            ToastAndroid.show("Your're not logged in", ToastAndroid.SHORT);
+            this.props.navigation.navigate('Login');
           } else {
-              array = arrayData;
-            }
-            console.log(array);
-            this.setState({ list: array });
-        }
+            throw Error;
+          }
+        })
+        .then((responseJson) => {
+            this.setState({
+              isLoading: false,
+              list: responseJson
+            });
+          }).catch((message) => { console.log(`error ${message}`); });
+      }
 
     render() {
         if (this.state.isLoading) {
@@ -163,8 +213,13 @@ class searchLocation extends Component {
                 <Container>
                   <Header searchBar rounded>
                     <Item>
+                      <TouchableOpacity onPress={() => this.search()}>
                       <Icon name="ios-search" />
-                      <Input placeholder="Search" onChangeText={this.search} />
+                      </TouchableOpacity>
+                      <Input 
+                      placeholder="Search" onChangeText={this.handleSearch} 
+                      value={this.state.search} 
+                      />
                     </Item>
                     <Button transparent>
                       <Text>Search</Text>
@@ -173,13 +228,92 @@ class searchLocation extends Component {
                   <CardItem>
                     <Item>
                       <Body>
+                      <View style={search.rowContainer}>
                     <TouchableOpacity 
                       activeOpacity={0.7} style={search.appButtonContainer} 
                       onPress={() => this.geolocation()}
                     >
                     <Text style={main.appButtonText}> Find the nearest</Text>
-                      
                     </TouchableOpacity>
+
+                    <TouchableOpacity 
+                      activeOpacity={0.7} style={search.appButtonContainer} 
+                      onPress={() => { this.setState({ show: true }); }}
+                    >
+                      <Text style={main.appButtonText}>Filter</Text>
+                    </TouchableOpacity>
+                    </View>
+                    <Modal
+                    transparent
+                    visible={this.state.show} 
+                    >
+                      <View style={{ backgroundColor: '#000000aa', flex: 1 }}>
+                      <View 
+                      style={{ 
+                      backgroundColor: '#ffffff', 
+                      flex: 1, 
+                      margin: 50, 
+                      padding: 40, 
+                      borderRadius: 10 }}
+                      >
+                      <Item rounded style={{ marginTop: 20, backgroundColor: 'white' }}>
+                      <Input 
+                        placeholder="Overall Rating 1-5" 
+                        onChangeText={this.handleOverall} maxLength={1} 
+                        value={this.state.overallRating} 
+                      />
+                      </Item>
+                      <Item rounded style={{ marginTop: 20, backgroundColor: 'white' }}>
+                      <Input 
+                        placeholder="Price Rating 1-5" 
+                        onChangeText={this.handlePrice} maxLength={1} 
+                        value={this.state.priceRating} 
+                      />
+                      </Item>
+                      <Item rounded style={{ marginTop: 20, backgroundColor: 'white' }}>
+                      <Input 
+                        placeholder="Quality Rating 1-5" 
+                        onChangeText={this.handleQuality} maxLength={1} 
+                        value={this.state.qualityRating} 
+                      />
+                      </Item>
+
+                      <Item rounded style={{ marginTop: 20, backgroundColor: 'white' }}>
+                      <Input 
+                        placeholder="Clenliness Rating 1-5" 
+                        onChangeText={this.handleClenliness} maxLength={1} 
+                        value={this.state.clenlinessRating} 
+                      />
+                      </Item>
+                
+                      <DropDownPicker
+                        items={[
+                            { label: 'None', value: '' },
+                            { label: 'Favourites', value: 'favourite' },
+                            { label: 'Reviewed', value: 'reviewed' },
+                        ]}
+                        defaultValue={this.state.search_in}
+                        containerStyle={{ height: 60 }}
+                        style={{ marginTop: 20, backgroundColor: '#fafafa' }}
+                        itemStyle={{
+                            justifyContent: 'flex-start'
+                        }}
+                        dropDownStyle={{ backgroundColor: '#fafafa' }}
+                        onChangeItem={item => this.setState({
+                            search_in: item.value
+                        })}
+                      />
+                      
+                      <TouchableOpacity 
+                      activeOpacity={0.7} style={search.appButtonCloseContainer} 
+                      onPress={() => { this.setState({ show: false }); }}
+                      > 
+                      <Text style={main.appButtonText}>X</Text>
+                    </TouchableOpacity>
+                      </View>
+                    </View>
+                    </Modal>
+                    <Text style={main.appButtonText}> Filter</Text>
                     </Body>
                     </Item>
                   </CardItem>

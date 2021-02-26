@@ -35,6 +35,10 @@ class updateAccount extends Component {
       this.setState({ errorLength: 'At least one of the fields are empty, check all fields',
                      isNull: false });
       return false;
+    } else if (this.state.isValidPassword === false) {
+      this.setState({ errorLength: 'Check password again!',
+                     isNull: false });
+      return false;
     }
     try {
       fetch(`http://10.0.2.2:3333/api/1.0.0/user/${userId}`,
@@ -122,8 +126,8 @@ handleEmail = (text) => {
 
       </View>
       <Form style={{ paddingLeft: 20, paddingRight: 20 }}>
+      
       <Item rounded style={{ marginTop: 20 }}>
-        
         <Input
           underlineColorAndroid="transparent"
           placeholder="Enter your new given name here"
@@ -147,6 +151,7 @@ handleEmail = (text) => {
           onChangeText={this.handleEmail} value={this.state.email}
           onEndEditing={(e) => handleEmail(e.nativeEvent.text)}
         /></Item>
+
         {this.state.isValidEmail ? null :
         <Text style={{ paddingLeft: 20, paddingRight: 20, color: 'red' }}>
                     {this.state.errorEmail}</Text>}
@@ -158,9 +163,11 @@ handleEmail = (text) => {
           autoCapitalize="none"
           secureTextEntry onChangeText={this.handlePassword} value={this.state.password}
         /></Item>
+
         {this.state.isValidPassword ? null :
         <Text style={{ paddingLeft: 20, paddingRight: 20, color: 'red' }}>
                     {this.state.errorPassword}</Text>}
+
         {this.state.isNull ? null :
         <Text style={{ paddingLeft: 20, paddingRight: 20, color: 'red' }}>
                     {this.state.errorLength}</Text>}
@@ -169,7 +176,7 @@ handleEmail = (text) => {
           style={main.appButtonContainer}
           onPress={() => this.editAccount()}
         >
-        <Text style={main.appButtonText}> Edit </Text>
+          <Text style={main.appButtonText}> Edit </Text>
         </TouchableOpacity>
         </Form>
         </View>

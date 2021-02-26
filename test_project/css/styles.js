@@ -49,7 +49,16 @@ const main = StyleSheet.create({
     alignSelf: 'center',
     fontWeight: 'bold',
     color: 'white', 
-  }
+  },
+  
+  close: {
+    margin: 5,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 25,
+    height: 25,
+  },
 });
 
 const editReview = StyleSheet.create({
@@ -138,11 +147,27 @@ const review = StyleSheet.create({
 const search = StyleSheet.create({
 
   appButtonContainer: {
+    margin: 10,
+    alignSelf: 'center',
     elevation: 8,
     backgroundColor: '#009688',
     borderRadius: 10,
     paddingVertical: 5,
     paddingHorizontal: 6
+  },
+
+  appButtonCloseContainer: {
+    margin: 5,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 25,
+    height: 25,
+    backgroundColor: 'red'
+  },
+
+  rowContainer: {
+    flexDirection: 'row'
   },
 });
 const update = StyleSheet.create({
