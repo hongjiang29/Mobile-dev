@@ -1,14 +1,14 @@
 /* eslint-disable no-mixed-operators */
 /* eslint-disable no-undef */
 import React, { Component } from 'react';
-import { View, TouchableOpacity, ToastAndroid, FlatList, StyleSheet, StatusBar, 
+import { View, TouchableOpacity, ToastAndroid, FlatList, 
          PermissionsAndroid, Image } from 'react-native';
 import { Container, Header, Input, Card, CardItem, Item, Text, Button, Icon, 
          Left, Body, Right, Content, Thumbnail } from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StarRating from 'react-native-star-rating';
 import Geolocation from '@react-native-community/geolocation';
-// import getDistance from 'geolib/es/getDistance';
+import { search, main } from '../css/styles';
 
 class searchLocation extends Component {
   constructor(props) {
@@ -67,25 +67,12 @@ class searchLocation extends Component {
       });
 };
 
-checkLoggedIn = async () => {
-  const value = await AsyncStorage.getItem('token');
-  if (value == null) {
-    this.props.navigation.navigate('Login');
-  }
-}
-    requestLocationPermission = async () => {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          this.setState({ locationPermission: true });
-        } else {
-          this.setState({ locationPermission: false });
-        }
-      } catch (err) {
-        console.warn(err);
+      getGeoLocation = async () => {
+        Geolocation.getCurrentPosition(position => {
+          this.setState({ latitude: position.coords.latitude,
+                        longitude: position.coords.longitude });
+        });
       }
-    }
 
      geolocation = async () => {
       await this.requestLocationPermission();
@@ -105,20 +92,38 @@ checkLoggedIn = async () => {
         return dist;
       };
       if (this.state.locationPermission) {
-      Geolocation.getCurrentPosition(position => {
-          this.setState({ latitude: position.coords.latitude,
-                         longitude: position.coords.longitude });
-        });
+        await this.getGeoLocation();
         const { latitude, longitude } = this.state;
         // eslint-disable-next-line prefer-arrow-callback
         arrayData.sort(function (a, b) {
           const origLat = latitude;
           const origLong = longitude;
-          return distance(origLat, origLong, a.latitude, a.longitude) -
-          distance(origLat, origLong, b.latitude, b.longitude);
+          return distance(origLat, origLong, b.latitude, b.longitude) -
+          distance(origLat, origLong, a.latitude, a.longitude);
         });
-      console.log(arrayData);
+      // console.log(position.coords.latitude);
       this.setState({ list: arrayData });
+      }
+    }
+
+    requestLocationPermission = async () => {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          this.setState({ locationPermission: true });
+        } else {
+          this.setState({ locationPermission: false });
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    }
+
+    checkLoggedIn = async () => {
+      const value = await AsyncStorage.getItem('token');
+      if (value == null) {
+        this.props.navigation.navigate('Login');
       }
     }
 
@@ -169,10 +174,10 @@ checkLoggedIn = async () => {
                     <Item>
                       <Body>
                     <TouchableOpacity 
-                      activeOpacity={0.7} style={styles.appButtonContainer} 
+                      activeOpacity={0.7} style={search.appButtonContainer} 
                       onPress={() => this.geolocation()}
                     >
-                    <Text style={styles.appButtonText}> Find the nearest</Text>
+                    <Text style={main.appButtonText}> Find the nearest</Text>
                       
                     </TouchableOpacity>
                     </Body>
@@ -196,14 +201,17 @@ checkLoggedIn = async () => {
                       </Left>
                     </CardItem>
                     <CardItem cardBody>
-                      <Image source={{ uri: 'https://picsum.photos/seed/picsum/200/300' }} style={{ height: 200, width: null, flex: 1 }} /> 
+                      <Image 
+                      source={{ uri: item.photo_path }} 
+                      style={{ height: 200, width: null, flex: 1 }} 
+                      /> 
                     </CardItem>
                     <CardItem>
                       <Body />
                       <Right>
                       <Text>
                         <StarRating
-                          containerStyle={styles.review}
+                          containerStyle={search.review}
                           starSize={25}
                           disabled
                           maxStars={5}
@@ -224,41 +232,5 @@ checkLoggedIn = async () => {
               );
         }
       }
-    const styles = StyleSheet.create({
-      container: {
-        flex: 1,
-        marginTop: StatusBar.currentHeight || 0,
-      },
-      appButtonText: {
-        fontSize: 18,
-        color: 'black',
-        fontWeight: 'bold',
-        alignSelf: 'center',
-        textTransform: 'uppercase'
-      },
-      separatorLine: {
-        height: 1,
-        backgroundColor: 'black',
-        paddingTop: 2,
-      },
-      items: {
-        padding: 20,
-        marginVertical: 8,
-        marginHorizontal: 16,
-      },
-      text: {
-        color: 'white',
-        fontSize: 25
-      },
-    
-      appButtonContainer: {
-        elevation: 8,
-        backgroundColor: '#009688',
-        borderRadius: 10,
-        paddingVertical: 5,
-        paddingHorizontal: 6
-      },
-    });
-  
 
 export default searchLocation;

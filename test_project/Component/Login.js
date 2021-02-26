@@ -1,10 +1,11 @@
 /* eslint-disable global-require */
 /* eslint-disable no-undef */
 import React, { Component } from 'react';
-import { View, StyleSheet, Dimensions, TouchableOpacity, Image, ImageBackground } 
+import { View, TouchableOpacity, Image, ImageBackground } 
 from 'react-native';
 import { Container, Form, Input, Text, Item } from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { login, main } from '../css/styles';
 
 
 class App extends Component {
@@ -123,7 +124,7 @@ class App extends Component {
     const navigation = this.props.navigation;
     return (
       <Container>
-      <ImageBackground source={require('../assets/background.jpg')} style={styles.backgroundImage}>
+      <ImageBackground source={require('../assets/background.jpg')} style={login.backgroundImage}>
       <View style={{ alignItems: 'center', margin: 20 }}>
 
       <Image 
@@ -147,17 +148,17 @@ class App extends Component {
       <Text style={{ paddingLeft: 20, paddingRight: 20, color: 'red' }}>
                   {this.state.errorLength}</Text>
       } 
-      <TouchableOpacity style={styles.appButtonContainer} onPress={() => this.login()}>
+      <TouchableOpacity style={login.appButtonContainer} onPress={() => this.login()}>
       
-      <Text style={styles.appButtonText}> Login </Text>
+      <Text style={main.appButtonText}> Login </Text>
         
       </TouchableOpacity>
 
       <TouchableOpacity 
-      style={styles.appButtonContainer} onPress={() => navigation.navigate('Signup')} 
+      style={login.appButtonContainer} onPress={() => navigation.navigate('Signup')} 
       >
       
-      <Text style={styles.appButtonText}> Signup </Text>
+      <Text style={main.appButtonText}> Signup </Text>
         
       </TouchableOpacity>
   
@@ -167,38 +168,6 @@ class App extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  appButtonContainer: {
-    marginTop: 20,
-    elevation: 8,
-    backgroundColor: '#009688',
-    borderRadius: 10,
-    padding: 5,
-    margin: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 12
-  },
-  container: {
-    flex: 1,
-},
-backgroundImage: {
-    flex: 1,
-    resizeMode: 'cover', // or 'stretch'
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
-},
-  appButtonText: {
-    fontSize: 18,
-    color: 'white',
-    fontWeight: 'bold',
-    alignSelf: 'center',
-    textTransform: 'uppercase'
-  },
-});
 
 export default App;
 

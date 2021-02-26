@@ -3,9 +3,10 @@
 /* eslint-disable no-control-regex */
 /* eslint-disable no-undef */
 import React, { Component } from 'react';
-import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Image, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Container, Form, Input, Text, Item } from 'native-base';
+import { Container, Form, Input, Text, Item, Header, Title } from 'native-base';
+import { main } from '../css/styles';
 
 class updateAccount extends Component {
   constructor(props) {
@@ -108,7 +109,9 @@ handleEmail = (text) => {
 
     return (
       <Container>
-      
+      <Header>
+        <Title style={{ fontWeight: 'bold', fontSize: 20, alignSelf: 'center' }}>ACCOUNT</Title>
+      </Header>
       <View style={{ alignItems: 'center', margin: 20 }}>
 
       <Image 
@@ -162,10 +165,10 @@ handleEmail = (text) => {
                     {this.state.errorLength}</Text>}
 
         <TouchableOpacity
-          style={styles.appButtonContainer}
+          style={main.appButtonContainer}
           onPress={() => this.editAccount()}
         >
-        <Text style={styles.appButtonText}> Edit </Text>
+        <Text style={main.appButtonText}> Edit </Text>
         </TouchableOpacity>
         {this.state.isNull ? null :
         <Text style={{ paddingLeft: 20, paddingRight: 20, color: 'red' }}>
@@ -177,22 +180,3 @@ handleEmail = (text) => {
 }
 
 export default updateAccount;
-
-const styles = StyleSheet.create({
- 
-  appButtonContainer: {
-    marginTop: 20,
-    elevation: 8,
-    backgroundColor: '#009688',
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 12
-  },
-  appButtonText: {
-    fontSize: 18,
-    color: 'white',
-    fontWeight: 'bold',
-    alignSelf: 'center',
-    textTransform: 'uppercase'
-  },
-});

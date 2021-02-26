@@ -1,11 +1,12 @@
 /* eslint-disable no-undef */
 
 import React, { Component } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Image, ToastAndroid } from 'react-native';
+import { View, FlatList, TouchableOpacity, Image, ToastAndroid } from 'react-native';
 import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Container, Header, Card, CardItem, Text, Button, Icon, Left, 
          Body, Right, Title, Subtitle, Item } from 'native-base';
+import { review, main } from '../css/styles';
 
 class Reviews extends Component {
   constructor(props) {
@@ -231,7 +232,7 @@ deleteReview = async (locationId, reviewId) => {
 
   starRating(rating) {
     return (<StarRating
-              containerStyle={styles.review}
+              containerStyle={review.review}
               starSize={20}
               disabled
               maxStars={5}
@@ -312,11 +313,11 @@ deleteReview = async (locationId, reviewId) => {
               </Body>
               <Right>
               <TouchableOpacity 
-              activeOpacity={0.7} style={styles.appButtonContainer} onPress={() => 
+              activeOpacity={0.7} style={main.appButtonContainer} onPress={() => 
               this.props.navigation.push('AddReview', { id: this.state.params })}
               >
                     
-              <Text style={styles.appButtonText}> + </Text>
+              <Text style={main.appButtonText}> + </Text>
               </TouchableOpacity>
               </Right>
            </Header>
@@ -361,19 +362,19 @@ deleteReview = async (locationId, reviewId) => {
                         </CardItem>  
                     <CardItem>
                       <Left>
-                    <Text style={styles.textrating}>
+                    <Text style={review.textrating}>
                       Price Rating: {'\n'}
                       {this.starRating(item.price_rating)}
                       </Text>
                       </Left>
                       <Body>
-                      <Text style={styles.textrating}>
+                      <Text style={review.textrating}>
                       Quality Rating: {'\n'}
                       {this.starRating(item.quality_rating)}
                       </Text>
                       </Body>
                       <Right>
-                      <Text style={styles.textrating}>
+                      <Text style={review.textrating}>
                       Clenliness Rating: {'\n'}
                       {this.starRating(item.clenliness_rating)}
                       </Text>
@@ -383,7 +384,7 @@ deleteReview = async (locationId, reviewId) => {
                       {this.renderFileUri(item.review_id)}
                     </CardItem>
                     <CardItem>
-                    <Text style={styles.text}>
+                    <Text style={review.text}>
                       Comment: {item.review_body}{'\n'}</Text>
                     </CardItem>
                     <CardItem>
@@ -405,44 +406,5 @@ deleteReview = async (locationId, reviewId) => {
           );
         }
       }
-    
-
-    const styles = StyleSheet.create({
-      review: {
-        alignItems: 'stretch'
-      },
-      separatorLine: {
-        height: 1,
-        backgroundColor: 'black',
-        paddingTop: 2,
-      },
-      textrating: {
-          fontSize: 12,
-          fontWeight: 'bold'
-      },
-
-      container: {
-        flex: 1,
-        padding: 10,
-      },  
-      appButtonContainer: {
-        width: 50,
-        marginTop: 10,
-        padding: 5,
-        margin: 10,
-        borderColor: 'black',
-        elevation: 8,
-        borderRadius: 10,
-        backgroundColor: 'green'
-      },
-      
-      appButtonText: {
-        fontSize: 20,
-        color: 'white',
-        fontWeight: 'bold',
-        alignSelf: 'center',
-        textTransform: 'uppercase',
-      },
-    });
 
 export default Reviews;

@@ -1,13 +1,13 @@
 /* eslint-disable no-undef */
 import React, { Component } from 'react';
-import { View, Image, StyleSheet, TouchableOpacity, ToastAndroid } from 'react-native';
+import { View, Image, TouchableOpacity, ToastAndroid } from 'react-native';
 import { Container, Form, Header, Title, Item, Input, Text, Button, Icon, Left, Body,
          Right, Content } from 'native-base';
 import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'react-native-image-picker';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import Filter from 'bad-words';
+import { main } from '../css/styles';
 
 
 class AddReview extends Component {
@@ -187,17 +187,17 @@ cameraLaunch = () => {
     if (this.state.fileUri) {
       return (<View><Image
         source={{ uri: this.state.fileUri }}
-        style={styles.images}
+        style={main.images}
       />
-        <TouchableOpacity style={styles.appDeleteContainer} onPress={() => this.removeImage()}>
-        <Text style={styles.appButtonText}> X </Text>
+        <TouchableOpacity style={main.appDeleteContainer} onPress={() => this.removeImage()}>
+        <Text style={main.appButtonText}> X </Text>
       </TouchableOpacity>
       </View>);
     } 
       return (<Image
         // eslint-disable-next-line global-require
         source={require('../assets/dummy.png')}
-        style={styles.images}
+        style={main.images}
       />);
   }
 
@@ -216,13 +216,13 @@ cameraLaunch = () => {
               <Right />
            </Header>
         <Content>
-      <View style={styles.container}>
+      <View style={main.container}>
       <Form style={{ paddingLeft: 20, paddingRight: 20 }}>
       <Item style={{ marginTop: 20 }}>
           <Text>
           Overall Rating: {'\n'}
             <StarRating
-                containerStyle={styles.review}
+                containerStyle={main.review}
                 starSize={25}
                 disabled={false}
                 maxStars={5}
@@ -233,7 +233,7 @@ cameraLaunch = () => {
 
             Price Rating: {'\n'}
               <StarRating
-                containerStyle={styles.review}
+                containerStyle={main.review}
                 starSize={25}
                 disabled={false}
                 maxStars={5}
@@ -244,7 +244,7 @@ cameraLaunch = () => {
 
             Quality Rating: {'\n'}
               <StarRating
-                containerStyle={styles.review}
+                containerStyle={main.review}
                 starSize={25}
                 disabled={false}
                 maxStars={5}
@@ -255,7 +255,7 @@ cameraLaunch = () => {
 
             Clenliness Rating: {'\n'}
               <StarRating
-                containerStyle={styles.review}
+                containerStyle={main.review}
                 starSize={25}
                 disabled={false}
                 maxStars={5}
@@ -280,19 +280,19 @@ cameraLaunch = () => {
             <Text style={{ paddingLeft: 20, paddingRight: 20, color: 'red' }}>
             {this.state.errorLength}</Text>}
                 
-      <TouchableOpacity style={styles.appButtonContainer} onPress={() => this.addreview()}>
+      <TouchableOpacity style={main.appButtonContainer} onPress={() => this.main()}>
       
-      <Text style={styles.appButtonText}> Add </Text>
+      <Text style={main.appButtonText}> Add </Text>
         
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.appButtonContainer} onPress={() => this.cameraLaunch()}>
+      <TouchableOpacity style={main.appButtonContainer} onPress={() => this.cameraLaunch()}>
       
-      <Text style={styles.appButtonText}> Take a Photo </Text>
+      <Text style={main.appButtonText}> Take a Photo </Text>
         
       </TouchableOpacity>
       <View>
-      <View style={styles.body}>
+      <View style={main.body}>
       {this.renderFileUri()}
         </View>
       </View>
@@ -304,63 +304,4 @@ cameraLaunch = () => {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 3,
-    padding: 24,
-  },
-  appDeleteContainer: {
-    backgroundColor: 'red',
-    width: 50,
-    marginTop: 10,
-    elevation: 3,
-    borderRadius: 10,
-    padding: 5,
-    margin: 10,
-    alignSelf: 'center'
-  },
-  appButtonContainer: {
-    marginTop: 10,
-    elevation: 8,
-    backgroundColor: '#009688',
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-  },
-  appButtonText: {
-    fontSize: 18,
-    color: 'white',
-    fontWeight: 'bold',
-    alignSelf: 'center',
-    textTransform: 'uppercase'
-  },
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-
-  body: {
-    margin: 10,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  
-  ImageSections: {
-    display: 'flex',
-    flexDirection: 'row',
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-    justifyContent: 'center'
-  },
-  images: {
-    width: 150,
-    height: 150,
-    borderColor: 'black',
-    borderWidth: 1,
-    marginHorizontal: 3
-  },
-  
-
-});
-
 export default AddReview;

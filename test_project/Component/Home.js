@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import React, { Component } from 'react';
-import { View, TouchableOpacity, ToastAndroid, FlatList, StyleSheet, StatusBar, Image }
+import { View, TouchableOpacity, ToastAndroid, FlatList, Image }
 from 'react-native';
 import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left,
          Body, Right, Title } from 'native-base';
@@ -219,7 +219,6 @@ checkFavourite(locationId) {
                       <Right>
                       <Text>
                         <StarRating
-                          containerStyle={styles.review}
                           starSize={25}
                           disabled
                           maxStars={5}
@@ -241,33 +240,5 @@ checkFavourite(locationId) {
           );
         }
         }
-    const styles = StyleSheet.create({
-      container: {
-        flex: 1,
-        marginTop: StatusBar.currentHeight || 0,
-      },
-      appButtonText: {
-        fontSize: 18,
-        color: 'black',
-        fontWeight: 'bold',
-        alignSelf: 'center',
-        textTransform: 'uppercase'
-      },
-      separatorLine: {
-        height: 1,
-        backgroundColor: 'black',
-        paddingTop: 2,
-      },
-      items: {
-        padding: 20,
-        marginVertical: 8,
-        marginHorizontal: 16,
-      },
-      text: {
-        color: 'white',
-        fontSize: 25
-      },
-    });
-  
 
 export default Home;

@@ -1,12 +1,13 @@
 /* eslint-disable no-undef */
 import React, { Component } from 'react';
-import { ToastAndroid, View, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { ToastAndroid, View, TouchableOpacity, Image } from 'react-native';
 import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Container, Form, Header, Title, Input, Text, Button, Icon, 
          Left, Body, Right, Item, Content } from 'native-base';
 import * as ImagePicker from 'react-native-image-picker';
 import Filter from 'bad-words';
+import { editReview, main } from '../css/styles';
 
 class EditReview extends Component {
   constructor(props) {
@@ -186,7 +187,6 @@ class EditReview extends Component {
       }
     });
 }
-  
 
   handleOverall = (rating) => {
     this.setState({ isNull: true,
@@ -217,7 +217,7 @@ class EditReview extends Component {
   
   starRating(rating) {
     return (<StarRating
-              containerStyle={styles.review}
+              containerStyle={main.review}
               starSize={20}
               disabled
               maxStars={5}
@@ -230,9 +230,9 @@ class EditReview extends Component {
     if (this.state.responseUrl) {
       return (<View><Image
         source={{ uri: this.state.responseUrl }}
-        style={styles.images}
+        style={main.images}
       />
-        <TouchableOpacity style={styles.close} onPress={() => this.removeImage()}>
+        <TouchableOpacity style={editReview.close} onPress={() => this.removeImage()}>
         <Icon name="ios-close-circle" size={25} />
         </TouchableOpacity>
       </View>);
@@ -262,13 +262,13 @@ class EditReview extends Component {
         </Body>
         <Right />
         </Header>
-      <View style={styles.container}>
+      <View style={main.container}>
       <Form style={{ paddingLeft: 20, paddingRight: 20 }}>
       <Item style={{ marginTop: 20 }}>
           <Text>
           Overall Rating: {'\n'}
             <StarRating
-                containerStyle={styles.review}
+                containerStyle={main.review}
                 starSize={25}
                 disabled={false}
                 maxStars={5}
@@ -279,7 +279,7 @@ class EditReview extends Component {
 
             Price Rating: {'\n'}
               <StarRating
-                containerStyle={styles.review}
+                containerStyle={main.review}
                 starSize={25}
                 disabled={false}
                 maxStars={5}
@@ -290,7 +290,7 @@ class EditReview extends Component {
 
             Quality Rating: {'\n'}
               <StarRating
-                containerStyle={styles.review}
+                containerStyle={main.review}
                 starSize={25}
                 disabled={false}
                 maxStars={5}
@@ -301,7 +301,7 @@ class EditReview extends Component {
 
             Clenliness Rating: {'\n'}
               <StarRating
-                containerStyle={styles.review}
+                containerStyle={main.review}
                 starSize={25}
                 disabled={false}
                 maxStars={5}
@@ -328,17 +328,17 @@ class EditReview extends Component {
               {this.state.errorLength}</Text>}
         
 
-      <TouchableOpacity style={styles.appButtonContainer} onPress={() => this.editreview()}>
+      <TouchableOpacity style={main.appButtonContainer} onPress={() => this.editreview()}>
       
-      <Text style={styles.appButtonText}> Edit </Text>
+      <Text style={main.appButtonText}> Edit </Text>
         
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.appButtonContainer} onPress={() => this.cameraLaunch()}>
-        <Text style={styles.appButtonText}> Take a New Photo </Text>
+      <TouchableOpacity style={main.appButtonContainer} onPress={() => this.cameraLaunch()}>
+        <Text style={main.appButtonText}> Take a New Photo </Text>
       </TouchableOpacity>
       <View>
-      <View style={styles.body}>
+      <View style={main.body}>
       {this.renderFileUri()}
         </View>
       </View>
@@ -349,58 +349,4 @@ class EditReview extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 3,
-    padding: 24,
-  },
-  body: {
-    margin: 10,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  close: {
-    margin: 5,
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    width: 25,
-    height: 25,
-  },
-  appDeleteContainer: {
-    backgroundColor: 'red',
-    width: 50,
-    marginTop: 10,
-    elevation: 3,
-    borderRadius: 10,
-    padding: 5,
-    margin: 10,
-    alignSelf: 'center'
-  },
-  appButtonContainer: {
-    marginTop: 20,
-    elevation: 8,
-    backgroundColor: '#009688',
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 12
-  },
-  appButtonText: {
-    fontSize: 18,
-    color: 'white',
-    fontWeight: 'bold',
-    alignSelf: 'center',
-    textTransform: 'uppercase'
-  },
-  images: {
-    width: 150,
-    height: 150,
-    borderColor: 'black',
-    borderWidth: 1,
-    marginHorizontal: 3
-  },
-
-});
-
 export default EditReview;

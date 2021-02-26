@@ -1,8 +1,9 @@
 /* eslint-disable no-undef */
 import React, { Component } from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Text } from 'native-base';
+import { logout, main } from '../css/styles';
 
 class Home extends Component {
   async getToken() {
@@ -51,59 +52,22 @@ class Home extends Component {
         return (
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
               <Text>Do you really want to log out?</Text>
-            <View style={styles.rowContainer}>
-            <TouchableOpacity style={styles.appRedButtonContainer} onPress={() => this.logout()}>
+            <View style={logout.rowContainer}>
+            <TouchableOpacity style={logout.appRedButtonContainer} onPress={() => this.logout()}>
               
-              <Text style={styles.appButtonText}> Yes </Text>
+              <Text style={main.appButtonText}> Yes </Text>
                 
               </TouchableOpacity>
 
               <TouchableOpacity 
-              style={styles.appGreenButtonContainer} onPress={() => navigation.navigate('Home')}
+              style={logout.appGreenButtonContainer} onPress={() => navigation.navigate('Home')}
               >
-              <Text style={styles.appButtonText}> No </Text>
+              <Text style={main.appButtonText}> No </Text>
               </TouchableOpacity>
               </View>
             </View>
           );
         }
     }
-
-    const styles = StyleSheet.create({
-
-      rowContainer: {
-        flexDirection: 'row'
-      },
-
-      appGreenButtonContainer: {
-        margin: 20,
-        elevation: 8,
-        backgroundColor: '#009688',
-        borderRadius: 10,
-        paddingVertical: 10,
-        paddingHorizontal: 12
-        
-      },
-
-      appRedButtonContainer: {
-        margin: 20,
-        elevation: 8,
-        backgroundColor: 'red',
-        borderRadius: 10,
-        paddingVertical: 10,
-        paddingHorizontal: 12
-        
-      },
-      
-      appButtonText: {
-        fontSize: 18,
-        color: 'white',
-        fontWeight: 'bold',
-        alignSelf: 'center',
-        textTransform: 'uppercase'
-      },
-      
-    
-    });
 
 export default Home;

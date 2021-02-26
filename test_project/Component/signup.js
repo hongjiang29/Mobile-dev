@@ -3,9 +3,10 @@
 /* eslint-disable no-control-regex */
 /* eslint-disable no-undef */
 import React, { Component } from 'react';
-import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { Container, Form, Header, Title, Input, Text, Button, Icon, Left, Body, Right, Item } 
-from 'native-base';
+import { View, TouchableOpacity, Image } from 'react-native';
+import { Container, Content, Form, Header, Title, Input, Text, Button, Icon, 
+         Left, Body, Right, Item } from 'native-base';
+import { main } from '../css/styles';
 
 
 class App extends Component {
@@ -118,6 +119,7 @@ class App extends Component {
         </Body>
         <Right />
         </Header>
+        <Content>
       
       <View style={{ alignItems: 'center', margin: 20 }}>
 
@@ -128,27 +130,25 @@ class App extends Component {
 
       </View>
 
-      <View style={styles.container}>
-
       <Form style={{ paddingLeft: 20, paddingRight: 20 }}>
       <Item rounded style={{ marginTop: 20 }}>
       
       <Input 
-        style={styles.inputText} placeholder="Enter First Name" 
+        placeholder="Enter First Name" 
         onChangeText={this.handleFirstname} value={this.state.firstName} 
       />
       </Item>
       <Item rounded style={{ marginTop: 20 }}>
 
       <Input 
-        style={styles.inputText} placeholder="Enter Last Name" 
+        placeholder="Enter Last Name" 
         onChangeText={this.handleLastname} value={this.state.lastName} 
       />
       </Item>
       <Item rounded style={{ marginTop: 20 }}>
 
       <Input 
-        style={styles.inputText} placeholder="Enter Email" onChangeText={this.handleEmail} 
+        placeholder="Enter Email" onChangeText={this.handleEmail} 
         value={this.state.email} onEndEditing={(e) => handleEmail(e.nativeEvent.text)} 
       />
       </Item>
@@ -157,7 +157,7 @@ class App extends Component {
                   {this.state.errorEmail}</Text>}
       <Item rounded style={{ marginTop: 20 }}>
       <Input 
-        style={styles.inputText} placeholder="Enter Password" 
+        placeholder="Enter Password" 
         secureTextEntry onChangeText={this.handlePassword} value={this.state.password} 
       />
       </Item>
@@ -168,38 +168,18 @@ class App extends Component {
       <Text style={{ paddingLeft: 20, paddingRight: 20, color: 'red' }}>
                   {this.state.errorLength}</Text>}
 
-      <TouchableOpacity style={styles.appButtonContainer} onPress={() => this.signup()}>
+      <TouchableOpacity style={main.appButtonContainer} onPress={() => this.signup()}>
       
-      <Text style={styles.appButtonText}> Signup </Text>
+      <Text style={main.appButtonText}> Signup </Text>
         
       </TouchableOpacity>
       </Form>
-      </View>
+      </Content>
+   
       </Container>
     );
   }
 }
-
-const styles = StyleSheet.create({
-
-  appButtonContainer: {
-    marginTop: 20,
-    elevation: 8,
-    backgroundColor: '#009688',
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 12
-  },
-  appButtonText: {
-    fontSize: 18,
-    color: 'white',
-    fontWeight: 'bold',
-    alignSelf: 'center',
-    textTransform: 'uppercase'
-  },
-  
-
-});
 
 export default App;
 
