@@ -11,3 +11,7 @@ The linting styling is eslint eslint-config-rallycoding
 Both Extensions tasks have been completed!
 
 Accessibility features: Tried my best with the colour scheme. Inserted a text to speech functionality. Added a decent amount of accessibility tags
+
+Validation is done throughout, in the edit and add reviews section
+
+Phew! Good Luck me!
