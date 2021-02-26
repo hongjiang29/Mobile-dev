@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+//Imported my required packages
 import React, { Component } from 'react';
 import { ToastAndroid, View, TouchableOpacity, Image } from 'react-native';
 import StarRating from 'react-native-star-rating';
@@ -12,7 +13,7 @@ import { editReview, main } from '../css/styles';
 class EditReview extends Component {
   constructor(props) {
     super(props);
-    console.log(props);
+    //State variables initialised
     this.state = {
       overallRating: props.route.params.review.overall_rating,
       priceRating: props.route.params.review.price_rating,
@@ -30,10 +31,12 @@ class EditReview extends Component {
     };
   }
 
+  //get the photo before anything is rendered
   componentDidMount() {
     this.getphoto();
   }
 
+  //Sends a request to retieve the photo to the coresponding review
   getphoto = async () => {
     const value = await AsyncStorage.getItem('token');
     const { reviewId, locationId } = this.state;
@@ -47,6 +50,7 @@ class EditReview extends Component {
       .then((res) => {
         if (res.status === 200) {
           console.log('success');
+          //state logs the image for rendering and sets some state variables for later usage
           this.setState({ 
             isloading: false, photo: true, responseUrl: `${res.url}?time=${new Date()}` });
         } else if (res.status === 401) {
@@ -59,23 +63,26 @@ class EditReview extends Component {
         }
       });
     }
-
+  
+  //POST request to update the review
   editreview = async () => {
     const navigation = this.props.navigation;
     const { reviewId, locationId, overallRating, priceRating, qualityRating, clenlinessRating, 
          reviewBody, responseUrl, photo } = this.state;
     const Token = await AsyncStorage.getItem('token');
+    //checking if any body is null
     if (reviewBody.length === 0) {
       this.setState({ error: 'Review box empty!',
                      isNull: false });
       return false;
     }
-
+    //validates whether the user wants to delete or add a photo to the review
     if (responseUrl === false && photo === true) {
       this.deletePhoto();
     } else if (responseUrl && photo === false) {
       this.addPhoto();
     }
+    //Extension task with the filtered out words
     const filter = new Filter();
     filter.addWords('tea', 'cakes', 'pastries');
     return fetch(`http://10.0.2.2:3333/api/1.0.0/location/${locationId}/review/${reviewId}`,
@@ -111,7 +118,7 @@ class EditReview extends Component {
       .catch((message) => { console.log(`error ${message}`); });
   }
 
-
+  // POST request to add a photo to the review
   addPhoto = async () => {
     const { locationId, reviewId } = this.state;
     const Token = await AsyncStorage.getItem('token');
@@ -136,6 +143,7 @@ class EditReview extends Component {
       .catch((message) => { console.log(`error ${message}`); });
   }
 
+  // This function is called when the user leaves the image box blank
   deletePhoto = async () => {
     const value = await AsyncStorage.getItem('token');
     const { reviewId, locationId } = this.state;
@@ -157,6 +165,7 @@ class EditReview extends Component {
       }).catch((message) => { console.log(`error ${message}`); });
   };
 
+  // Opens the camera if the user wants to take an image
   cameraLaunch = () => {
     const options = {
       storageOptions: {
@@ -184,7 +193,7 @@ class EditReview extends Component {
       }
     });
 }
-
+  // Recievieving string from input box to get current value from user 
   handleOverall = (rating) => {
     this.setState({ isNull: true,
                    overallRating: rating });
@@ -211,7 +220,7 @@ class EditReview extends Component {
   removeImage = () => {
     this.setState({ responseUrl: false });
 }
-  
+  // Template for rendering the star rating system
   starRating(rating) {
     return (<StarRating
               containerStyle={main.review}
@@ -222,7 +231,7 @@ class EditReview extends Component {
               fullStarColor={'gold'}
     />);
   }
-
+  // function to render the image if it exists
   renderFileUri() {
     if (this.state.responseUrl) {
       return (<View><Image
@@ -236,7 +245,7 @@ class EditReview extends Component {
     }
   }
 
-
+  // here is where all the magic happens
   render() {
     if (this.state.isloading) {
       return (

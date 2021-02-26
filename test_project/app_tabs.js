@@ -25,6 +25,7 @@ const Stack = createStackNavigator();
 class App extends Component {
   render() {
     return (
+        // main pages to initiate
         <NavigationContainer>
             
         <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
@@ -39,7 +40,8 @@ class App extends Component {
         </NavigationContainer>
         );  
     }
-}
+}   
+    // tab navigator to allow the user to have easy access from important pages
     function HomeLogstack() {
         return (
             <Tab.Navigator

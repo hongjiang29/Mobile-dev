@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+// Important imports loading like so 
 import React, { Component } from 'react';
 import { View, TouchableOpacity, ToastAndroid, FlatList, Image }
 from 'react-native';
@@ -19,6 +20,7 @@ class Home extends Component {
     };
   }
 
+  // Home page requies us to see more data on its face
   componentDidMount() {
     this.unsubscribe = this.props.navigation.addListener('focus', () => {
       this.checkLoggedIn();
@@ -30,7 +32,7 @@ class Home extends Component {
   componentWillUnmount() {
     this.unsubscribe();
   }
-
+  // Checks whether the user has favourited any location
   getFavourite = async () => {
     const value = await AsyncStorage.getItem('token');
     const userId = await AsyncStorage.getItem('id');
@@ -52,6 +54,7 @@ class Home extends Component {
         }
       })
       .then((responseJson) => {
+        // Stores the information here into a state for later use 
         const favs = (responseJson.favourite_locations);
         this.setState({
           favouritePlaces: []
@@ -64,6 +67,7 @@ class Home extends Component {
         }).catch((message) => { console.log(`error ${message}`); });
       }
 
+  // Get's all of the location information to render
   getData = async () => {
     const value = await AsyncStorage.getItem('token');
     return fetch('http://10.0.2.2:3333/api/1.0.0/find', 
@@ -89,7 +93,7 @@ class Home extends Component {
           });
         }).catch((message) => { console.log(`error ${message}`); });
 };
-
+  // This will send an api fetch to favourite the review 
   favourite = async (locationId) => {
     const value = await AsyncStorage.getItem('token');
     return fetch(`http://10.0.2.2:3333/api/1.0.0/location/${locationId}/favourite`, 
@@ -112,6 +116,7 @@ class Home extends Component {
       }).catch((message) => { console.log(`error ${message}`); });
 };
 
+// this will unfavourite the review
 unfavourite = async (locationId) => {
   const value = await AsyncStorage.getItem('token');
   return fetch(`http://10.0.2.2:3333/api/1.0.0/location/${locationId}/favourite`, 
@@ -145,7 +150,7 @@ checkLoggedIn = async () => {
     this.props.navigation.navigate('Login');
   }
 }
-
+// validates whether it's a un/favourite
 checkFavourite(locationId) {
   if (this.state.favouritePlaces.includes(locationId)) {
     return true;
@@ -153,7 +158,7 @@ checkFavourite(locationId) {
     return false;
 }
 
-
+  // renders the favourites button as accordingly to differientiate 
   renderAuthButton = (locationId) => {
     const bool = this.checkFavourite(locationId);
     if (bool === true) {
@@ -173,7 +178,7 @@ checkFavourite(locationId) {
             <Text>Favourite</Text>
           </Button>);
 }
-
+     // here is where all the magic happens
     render() {
         if (this.state.isLoading) {
           return (

@@ -1,5 +1,6 @@
 /* eslint-disable global-require */
 /* eslint-disable no-undef */
+// Imports all the packages needed
 import React, { Component } from 'react';
 import { View, TouchableOpacity, Image, ImageBackground } 
 from 'react-native';
@@ -11,7 +12,7 @@ import { login, main } from '../css/styles';
 class App extends Component {
   constructor(props) {
     super(props);
-
+    // state variables initialised 
     this.state = {
       email: '',
       password: '',
@@ -32,17 +33,7 @@ class App extends Component {
     this.unsubscribe();
   }
 
-  async getId() {
-		try {
-			const id = await AsyncStorage.getItem('id');
-			console.log(`${id}`);
-			return id;
-		} catch (e) {
-			console.log(`DEBUG: Failed to get userId: ${e}`);
-			this.props.navigation.navigate('Logout');
-		}
-	}
-
+  // Api call to log the user in, added validation to help the user  
   login = async () => {
     const { email, password } = this.state;
 
@@ -85,7 +76,7 @@ class App extends Component {
         this.storeLogin().then();
         }).catch((message) => { console.log(`error ${message}`); });
 }
-
+  // Recievieving string from input box to get current value from user 
   handleEmail = (text) => {
     this.setState({ isNull: true,
                   email: text });
@@ -102,7 +93,7 @@ class App extends Component {
       this.props.navigation.reset({ routes: [{ name: 'Home' }] });
     }
   }
-
+  // storing the login details for async calls for future api calls
   async storeLogin() {
     try {
 			const id = this.state.id;
@@ -119,7 +110,7 @@ class App extends Component {
 			console.log(`DEBUG: Failed to store id and token: ${e}`);
 		}
 	}
-
+  // here is where all the magic happens
   render() {
     const navigation = this.props.navigation;
     return (

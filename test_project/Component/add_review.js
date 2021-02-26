@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+// Package imports
 import React, { Component } from 'react';
 import { View, Image, TouchableOpacity, ToastAndroid } from 'react-native';
 import { Container, Form, Header, Title, Item, Input, Text, Button, Icon, Left, Body,
@@ -13,7 +14,7 @@ import { main } from '../css/styles';
 class AddReview extends Component {
   constructor(props) {
     super(props);
-
+    // declaring state variables
     this.state = {
       overallRating: 0,
       priceRating: 0,
@@ -30,7 +31,7 @@ class AddReview extends Component {
     };
   }
 
-
+//Getting the last review that was just been logged
 getData = async () => {
   const id = this.state.params;
   console.log(id);
@@ -46,6 +47,7 @@ getData = async () => {
       }
     })
     .then((responseJson) => {
+        //look at the last object of the list and log it
         this.setState({
           listData: responseJson.location_reviews[responseJson.location_reviews.length - 1]
         });
@@ -53,6 +55,7 @@ getData = async () => {
       });
 };
 
+//Opens the camera for user
 cameraLaunch = () => {
   const options = {
     storageOptions: {
@@ -80,17 +83,19 @@ cameraLaunch = () => {
   });
 }
 
+  //fetch to add a review
   addreview = async () => {
     const navigation = this.props.navigation;
     const id = this.state.params;
     const { overallRating, priceRating, qualityRating, clenlinessRating, reviewBody } = this.state;
-  
+    //checking if any values are null
     if (overallRating === 0 || priceRating === 0 || qualityRating === 0 || 
         clenlinessRating === 0 || reviewBody.length === 0) {
       this.setState({ errorLength: 'One of the ratings or review box is empty!',
                      isNull: false });
       return false;
     }
+    //Extension task with the filtered out words
     const filter = new Filter();
     filter.addWords('tea', 'cakes', 'pastries');
     const Token = await AsyncStorage.getItem('token');
@@ -113,6 +118,7 @@ cameraLaunch = () => {
       })
       .then((res) => {
         if (res.status === 201) {
+          //if photo has been added, get the latest review data
           if (this.state.fileUri) {
             this.getData();
           } else {
@@ -128,6 +134,7 @@ cameraLaunch = () => {
       .catch((message) => { console.log(`error ${message}`); });
   }
 
+  //if added, system sends a fetch to add image to review
   addPhoto = async () => {
     const navigation = this.props.navigation;
     const id = this.state.params;
@@ -155,6 +162,7 @@ cameraLaunch = () => {
       .catch((message) => { console.log(`error ${message}`); });
   }
 
+  //Recievieving string from input box to get current value from user 
   handleOverall = (rating) => {
     this.setState({ isNull: true,
                    overallRating: rating });
@@ -183,6 +191,7 @@ cameraLaunch = () => {
       this.setState({ fileUri: false });
   }
 
+  //this renders the image if the review has one
   renderFileUri() {
     if (this.state.fileUri) {
       return (<View><Image
@@ -200,13 +209,16 @@ cameraLaunch = () => {
         style={main.images}
       />);
   }
-
+  //here is where all the magic happens
   render() {
     return (
       <Container>
         <Header>
             <Left>
-            <Button accessibilityHint='Click here to back to reviews' transparent onPress={() => this.props.navigation.goBack()}>
+            <Button 
+            accessibilityHint='Click here to back to reviews' transparent onPress={() => 
+              this.props.navigation.goBack()}
+            >
               <Icon name='arrow-back' />
             </Button>
               </Left>

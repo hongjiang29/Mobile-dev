@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-
+// Import loaded in
 import React, { Component } from 'react';
 import { View, FlatList, TouchableOpacity, Image, ToastAndroid } from 'react-native';
 import StarRating from 'react-native-star-rating';
@@ -12,7 +12,6 @@ import { review, main } from '../css/styles';
 class Reviews extends Component {
   constructor(props) {
     super(props);
-    
 
     // the components state
     this.state = {
@@ -26,6 +25,7 @@ class Reviews extends Component {
         params: props.route.params.id
     };
   }
+  // get's the required information first, before anything is executed
   async componentDidMount() {
     this.unsubscribe = this.props.navigation.addListener('focus', () => {
       this.checkLoggedIn();
@@ -37,7 +37,8 @@ class Reviews extends Component {
   componentWillUnmount() {
     this.unsubscribe();
   }
-
+  // this is executed when the getdata function finishes its function. 
+  // returns a list of photos corresponding to the reviews
   getphoto = async () => {
     const value = await AsyncStorage.getItem('token');
     const array = this.state.location_ids;
@@ -60,6 +61,7 @@ class Reviews extends Component {
           console.log('forbidden');
         }
       }).then((response) => {
+        // checks if the photo isn't undefined so thati t can be rendered properly
         if (typeof (response) === 'undefined') {
           return false;
         } 
@@ -70,7 +72,7 @@ class Reviews extends Component {
     this.setState({ photo: photos,
       isLoading: false });
     }
-
+    // getting all the reviews relating to the location. Also stores the review_ids 
     getData = async () => {
       const id = this.state.params;
       return fetch(`http://10.0.2.2:3333/api/1.0.0/location/${id}`)
@@ -100,6 +102,7 @@ class Reviews extends Component {
           });
   };
 
+  // gets the likes status and pulls the reviews that the user has added themselves
   getLikes = async () => {
     const userId = await AsyncStorage.getItem('id');
     const value = await AsyncStorage.getItem('token');
@@ -136,7 +139,7 @@ class Reviews extends Component {
         });
         });
 };
-
+  // User is directed here if they hit the like button, corresponding to the review
   like = async (locationId, reviewId) => {
     const value = await AsyncStorage.getItem('token');
     return fetch(`http://10.0.2.2:3333/api/1.0.0/location/${locationId}/review/${reviewId}/like`, 
@@ -147,6 +150,7 @@ class Reviews extends Component {
       },
     }).then((res) => {
         if (res.status === 200) {
+          //when successful, get the current state of the database and render
           this.getData();
           const joined = this.state.likes.concat(reviewId);
           this.setState({ boolPhoto: false, likes: joined });
@@ -158,7 +162,7 @@ class Reviews extends Component {
         }
       });
 };
-
+// User is directed here if they hit the unlike button, corresponding to the review
 unLike = async (locationId, reviewId) => {
   const value = await AsyncStorage.getItem('token');
   return fetch(`http://10.0.2.2:3333/api/1.0.0/location/${locationId}/review/${reviewId}/like`, 
@@ -170,6 +174,7 @@ unLike = async (locationId, reviewId) => {
   })
     .then((res) => {
       if (res.status === 200) {
+        //when successful, get the current state of the database and render
         this.getData();
         const array = [...this.state.likes]; // make a separate copy of the array
         const index = array.indexOf(reviewId);
@@ -193,6 +198,7 @@ checkLoggedIn = async () => {
   }
 }
 
+// Deletes the review when the user presses the button
 deleteReview = async (locationId, reviewId) => {
   const value = await AsyncStorage.getItem('token');
   return fetch(`http://10.0.2.2:3333/api/1.0.0/location/${locationId}/review/${reviewId}`, 
@@ -204,6 +210,7 @@ deleteReview = async (locationId, reviewId) => {
   }).then((res) => {
       if (res.status === 200) {
         this.setState({ boolPhoto: false });
+        // when successful, re-render
         this.getData();
         ToastAndroid.show('Review Deleted!', ToastAndroid.SHORT);
       } else if (res.status === 401) {
@@ -213,7 +220,7 @@ deleteReview = async (locationId, reviewId) => {
       }
     });
 };
-
+  // checks if the user has liked a review to render like icon
   checkLikes(reviewId) {
     if (this.state.likes.includes(reviewId)) {
       return true;
@@ -221,13 +228,14 @@ deleteReview = async (locationId, reviewId) => {
       return false;
   }
 
+  // checks if the user owns the review to render edit button
   checkReviews(reviewId) {
     if (this.state.myReviews.includes(reviewId)) {
       return true;
     } 
       return false;
   }
-
+  // star rating template
   starRating(rating) {
     return (<StarRating
               containerStyle={review.review}
@@ -238,11 +246,11 @@ deleteReview = async (locationId, reviewId) => {
               fullStarColor={'gold'}
     />);
   }
-
+  // extra feature that allows text to speech
   speechToText = (text) => {
     Tts.speak(text);
   }
-
+  // renders image if review has one
   renderFileUri(reviewId) {
     if (this.state.photo[reviewId]) {
       return (<Image 
@@ -251,7 +259,7 @@ deleteReview = async (locationId, reviewId) => {
       />);
     } 
     }
-
+    // renders the like button accordingly if it is highlighted or not
   renderLikeButton = (item) => {
     const bool = this.checkLikes(item.review_id);
     const id = this.state.params;
@@ -272,7 +280,7 @@ deleteReview = async (locationId, reviewId) => {
             <Text>{item.likes}</Text>
           </Button>);
 }
-
+// renders the edit button accordingly if it belongs to the user
   renderEditButton = (item, locId) => {
     const bool = this.checkReviews(item.review_id);
     if (bool === true) {
@@ -286,7 +294,7 @@ deleteReview = async (locationId, reviewId) => {
           </Button>);
   }
 }
-
+// renders the delete button accordingly if it belongs to the user
   renderDeleteButton = (reviewId) => {
     const bool = this.checkReviews(reviewId);
     const id = this.state.params;
@@ -299,7 +307,7 @@ deleteReview = async (locationId, reviewId) => {
           </Button>);
   }
   }
-
+// here is where all the magic happens
     render() {
         if (this.state.isLoading) {
             return (

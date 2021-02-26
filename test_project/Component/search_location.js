@@ -1,9 +1,11 @@
+/* eslint-disable import/no-named-as-default-member */
+/* eslint-disable import/no-named-as-default */
 /* eslint-disable no-mixed-operators */
 /* eslint-disable no-undef */
 import React, { Component } from 'react';
 import { View, TouchableOpacity, ToastAndroid, FlatList, 
          PermissionsAndroid, Image, Modal } from 'react-native';
-import { Container, Header, Input, Card, CardItem, Item, Text, Button, Icon, 
+import { Container, Header, Input, Card, CardItem, Item, Text, Icon, 
          Left, Body, Right, Content, Thumbnail, Spinner } from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StarRating from 'react-native-star-rating';
@@ -29,10 +31,13 @@ class searchLocation extends Component {
       priceRating: '',
       qualityRating: '',
       clenlinessRating: '',
-      search_in: ''
+      search_in: '',
+      limit: '',
+      offset: ''
     };
   }
 
+  // Checks if person is logged in and loads the neccessary information
   componentDidMount() {
     this.unsubscribe = this.props.navigation.addListener('focus', () => {
       this.checkLoggedIn();
@@ -44,6 +49,7 @@ class searchLocation extends Component {
     this.unsubscribe();
   }
   
+  // hitting the find endpoint to temporarily store it
   getData = async () => {
     const value = await AsyncStorage.getItem('token');
     return fetch('http://10.0.2.2:3333/api/1.0.0/find', 
@@ -63,6 +69,7 @@ class searchLocation extends Component {
         }
       })
       .then((responseJson) => {
+          //storing all the locations data
           this.setState({
             isLoading: false,
             list: responseJson,
@@ -73,7 +80,7 @@ class searchLocation extends Component {
         console.log(message);
       });
 };
-
+      //function to get the users location when permission is granted
       getGeoLocation = async () => {
         Geolocation.getCurrentPosition(position => {
           this.setState({ latitude: position.coords.latitude,
@@ -81,8 +88,11 @@ class searchLocation extends Component {
         });
       }
 
+      //called when user requests a location closest to them
      geolocation = async () => {
+      //gets the permission, if true then it continues
       await this.requestLocationPermission();
+      // Maths to calculate the latitide and longitude to meters
       const arrayData = this.state.listData;
       const distance = function (lat1, lon1, lat2, lon2) {
         const radlat1 = Math.PI * lat1 / 180;
@@ -98,9 +108,11 @@ class searchLocation extends Component {
       
         return dist;
       };
+      //validates where permission has been granted
       if (this.state.locationPermission) {
         await this.getGeoLocation();
         const { latitude, longitude } = this.state;
+        //A sort functio that orders the list to shortest distance first
         // eslint-disable-next-line prefer-arrow-callback
         arrayData.sort(function (a, b) {
           const origLat = latitude;
@@ -108,10 +120,12 @@ class searchLocation extends Component {
           return distance(origLat, origLong, b.latitude, b.longitude) -
           distance(origLat, origLong, a.latitude, a.longitude);
         });
+      ToastAndroid.show('Nearest place found!', ToastAndroid.SHORT);
       this.setState({ list: arrayData });
       }
     }
 
+    // requesting permission from phone settings
     requestLocationPermission = async () => {
       try {
         const granted = await PermissionsAndroid.request(
@@ -126,6 +140,7 @@ class searchLocation extends Component {
       }
     }
 
+    //Recievieving string from input box to get current value from user 
     handleSearch = (text) => {
       this.setState({ search: text });
     }
@@ -150,6 +165,14 @@ class searchLocation extends Component {
       this.setState({ search_in: text });
     }
 
+    handleLimit = (text) => {
+      this.setState({ limit: text });
+    }
+
+    handleOffset = (text) => {
+      this.setState({ offset: text });
+    }
+
     checkLoggedIn = async () => {
       const value = await AsyncStorage.getItem('token');
       if (value == null) {
@@ -157,6 +180,7 @@ class searchLocation extends Component {
       }
     }
 
+    // Includes search ability and all of the other query find endpoints if requested
     search = async () => {
       const value = await AsyncStorage.getItem('token');
       const searchObject = this.state.search;
@@ -176,6 +200,12 @@ class searchLocation extends Component {
       if (this.state.search_in) {
         url = `${url}&search_in=${this.state.search_in}`;
       }
+      if (this.state.limit) {
+        url = `${url}&limit=${this.state.limit}`;
+      }
+      if (this.state.offset) {
+        url = `${url}&offset=${this.state.offset}`;
+      }
       return fetch(url, 
       {
         headers: {
@@ -184,6 +214,7 @@ class searchLocation extends Component {
       })
         .then((res) => {
           if (res.status === 200) {
+            ToastAndroid.show('Query Passed!', ToastAndroid.SHORT);
             return res.json();
           } else if (res.status === 401) {
             ToastAndroid.show("Your're not logged in", ToastAndroid.SHORT);
@@ -193,13 +224,15 @@ class searchLocation extends Component {
           }
         })
         .then((responseJson) => {
+          // sets the queried data to the flatlist
             this.setState({
               isLoading: false,
               list: responseJson
             });
           }).catch((message) => { console.log(`error ${message}`); });
       }
-
+      
+   // here is where all the magic happens
     render() {
         if (this.state.isLoading) {
           return (
@@ -257,7 +290,15 @@ class searchLocation extends Component {
                       padding: 40, 
                       borderRadius: 10 }}
                       >
-                      <Item rounded style={{ marginTop: 20, backgroundColor: 'white' }}>
+                      <TouchableOpacity 
+                      accessible
+                      activeOpacity={0.7} style={search.appButtonCloseContainer} 
+                      onPress={() => { this.setState({ show: false }); }}
+                      > 
+                      <Text style={main.appButtonText}>X</Text>
+                    </TouchableOpacity>
+                      
+                      <Item rounded style={{ marginTop: 10 }}>
                       <Input
                         accessibilityLabel='Enter Overall Rating of values between 1 and 5'
                         placeholder="Overall Rating 1-5" 
@@ -265,7 +306,7 @@ class searchLocation extends Component {
                         value={this.state.overallRating} 
                       />
                       </Item>
-                      <Item rounded style={{ marginTop: 20, backgroundColor: 'white' }}>
+                      <Item rounded style={{ marginTop: 10 }}>
                       <Input 
                         accessibilityLabel='Enter Price Rating of values between 1 and 5'
                         placeholder="Price Rating 1-5" 
@@ -273,7 +314,7 @@ class searchLocation extends Component {
                         value={this.state.priceRating} 
                       />
                       </Item>
-                      <Item rounded style={{ marginTop: 20, backgroundColor: 'white' }}>
+                      <Item rounded style={{ marginTop: 10 }}>
                       <Input 
                         accessibilityLabel='Enter Quality Rating of values between 1 and 5'
                         placeholder="Quality Rating 1-5" 
@@ -282,7 +323,7 @@ class searchLocation extends Component {
                       />
                       </Item>
 
-                      <Item rounded style={{ marginTop: 20, backgroundColor: 'white' }}>
+                      <Item rounded style={{ marginTop: 10 }}>
                       <Input 
                         accessibilityLabel='Enter Clenliness of values between 1 and 5'
                         placeholder="Clenliness Rating 1-5" 
@@ -290,7 +331,24 @@ class searchLocation extends Component {
                         value={this.state.clenlinessRating} 
                       />
                       </Item>
-                
+
+                      <Item rounded style={{ marginTop: 10 }}>
+                      <Input 
+                        accessibilityLabel='The number of location you want to return'
+                        placeholder="Location returned 99 Max" 
+                        onChangeText={this.handleLimit} maxLength={2} 
+                        value={this.state.limit} 
+                      />
+                      </Item>
+                      <Item rounded style={{ marginTop: 10 }}>
+                      <Input 
+                        accessibilityLabel='Number of objects you want to skip'
+                        placeholder="Skipping locations 99 Max" 
+                        onChangeText={this.handleOffset} maxLength={2} 
+                        value={this.state.offset} 
+                      />
+                      </Item>
+                      
                       <DropDownPicker
                         accessibilityLabel='pick your favourites or reviewed places'
                         items={[
@@ -299,8 +357,8 @@ class searchLocation extends Component {
                             { label: 'Reviewed', value: 'reviewed' },
                         ]}
                         defaultValue={this.state.search_in}
-                        containerStyle={{ height: 60 }}
-                        style={{ marginTop: 20, backgroundColor: '#fafafa' }}
+                        containerStyle={{ height: 50 }}
+                        style={{ marginTop: 15, backgroundColor: '#fafafa' }}
                         itemStyle={{
                             justifyContent: 'flex-start'
                         }}
@@ -309,14 +367,7 @@ class searchLocation extends Component {
                             search_in: item.value
                         })}
                       />
-                      
-                      <TouchableOpacity 
-                      accessible
-                      activeOpacity={0.7} style={search.appButtonCloseContainer} 
-                      onPress={() => { this.setState({ show: false }); }}
-                      > 
-                      <Text style={main.appButtonText}>X</Text>
-                    </TouchableOpacity>
+                    
                       </View>
                     </View>
                     </Modal>

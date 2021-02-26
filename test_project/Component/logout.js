@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+// Imports include for needed uses
 import React, { Component } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -6,6 +7,7 @@ import { Text } from 'native-base';
 import { logout, main } from '../css/styles';
 
 class Home extends Component {
+  // gets the token from asyncstorage
   async getToken() {
       try {
         const token = await AsyncStorage.getItem('token');
@@ -15,7 +17,7 @@ class Home extends Component {
         console.log(`DEBUG: Failed to get id: ${e}`);
       }
     }
-
+  // deletes credentials when logout api returns 200
   async deleteDetails() {
 		try {
 			await AsyncStorage.removeItem('token');
@@ -25,6 +27,7 @@ class Home extends Component {
 		}
 	}
 
+  // api call to log the user out when confirmed, navigates to login page
   logout = async () => {
     const Token = await this.getToken();
     console.log(Token);
@@ -46,7 +49,7 @@ class Home extends Component {
       }
     }).catch((message) => { console.log(`error ${message}`); });
 }
-
+    // here is where all the magic happens
     render() {
         const navigation = this.props.navigation;
         return (
