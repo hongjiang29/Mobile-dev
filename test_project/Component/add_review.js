@@ -1,22 +1,25 @@
+/* eslint-disable no-undef */
 import React, { Component } from 'react';
-import { TextInput, View, Image, StyleSheet, Alert, ScrollView, TouchableOpacity, StatusBar, SafeAreaView} from 'react-native';
-import { Container, Form, Header, Title, CardItem, Item, Input, Text, Button, Icon, Left, Body, Right, Content } from 'native-base';
+import { View, Image, StyleSheet, TouchableOpacity, ToastAndroid } from 'react-native';
+import { Container, Form, Header, Title, Item, Input, Text, Button, Icon, Left, Body,
+         Right, Content } from 'native-base';
 import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'react-native-image-picker';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
+import Filter from 'bad-words';
 
 
 class AddReview extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
 
     this.state = {
-      overall_rating: 0,
-      price_rating: 0,
-      quality_rating: 0,
-      clenliness_rating: 0,
-      review_body: '',
+      overallRating: 0,
+      priceRating: 0,
+      qualityRating: 0,
+      clenlinessRating: 0,
+      reviewBody: '',
       params: props.route.params.id,
       image: false,
       listData: [],
@@ -27,181 +30,175 @@ class AddReview extends Component {
     };
   }
 
-  cameraLaunch = () => {
-    let options = {
-      storageOptions: {
-        skipBackup: true,
-        path: 'images',
-      },
-    };
-    ImagePicker.launchCamera(options, (response) => {
-      console.log('Response = ', response);
-
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-        alert(response.customButton);
-      } else {
-        console.log('response', JSON.stringify(response.uri));
-        this.setState({
-          file: response,
-          fileUri: response.uri
-        });
-      }
-    });
-}
 
 getData = async () => {
-  let id = this.state.params;
-  console.log(id)
-  return fetch("http://10.0.2.2:3333/api/1.0.0/location/"+id)
-    .then ((res) => {
-      if (res.status === 200)
-      {
+  const id = this.state.params;
+  console.log(id);
+  return fetch(`http://10.0.2.2:3333/api/1.0.0/location/${id}`)
+    .then((res) => {
+      if (res.status === 200) {
         return res.json();
-      }else if (res.status === 401){
-        ToastAndroid.show("Your're not logged in", ToastAndroid.SHORT)
-        this.props.navigation.navigate("Login")
-      }
-      else{
-        throw 'failed';
+      } else if (res.status === 401) {
+        ToastAndroid.show("Your're not logged in", ToastAndroid.SHORT);
+        this.props.navigation.navigate('Login');
+      } else {
+        throw Error;
       }
     })
-    .then ((responseJson) => {
+    .then((responseJson) => {
         this.setState({
           listData: responseJson.location_reviews[responseJson.location_reviews.length - 1]
-        })
-        this.addPhoto()
-      })
+        });
+        this.addPhoto();
+      });
 };
+
+cameraLaunch = () => {
+  const options = {
+    storageOptions: {
+      skipBackup: true,
+      path: 'images',
+    },
+  };
+  ImagePicker.launchCamera(options, (response) => {
+    console.log('Response = ', response);
+
+    if (response.didCancel) {
+      console.log('User cancelled image picker');
+    } else if (response.error) {
+      console.log('ImagePicker Error: ', response.error);
+    } else if (response.customButton) {
+      console.log('User tapped custom button: ', response.customButton);
+      alert(response.customButton);
+    } else {
+      console.log('response', JSON.stringify(response.uri));
+      this.setState({
+        file: response,
+        fileUri: response.uri
+      });
+    }
+  });
+}
 
   addreview = async () => {
     const navigation = this.props.navigation;
-    let id = this.state.params;
-    let {overall_rating, price_rating, quality_rating, clenliness_rating, review_body} = this.state;
+    const id = this.state.params;
+    const { overallRating, priceRating, qualityRating, clenlinessRating, reviewBody } = this.state;
   
-    if (overall_rating == 0 || price_rating == 0 || quality_rating == 0 || clenliness_rating == 0 || review_body.length == 0){
-      this.setState({errorLength: 'One of the ratings or review box is empty!',
-                     isNull: false})
-      return false
+    if (overallRating === 0 || priceRating === 0 || qualityRating === 0 || 
+        clenlinessRating === 0 || reviewBody.length === 0) {
+      this.setState({ errorLength: 'One of the ratings or review box is empty!',
+                     isNull: false });
+      return false;
     }
-
-    var Filter = require('bad-words'),
-    filter = new Filter();
+    const filter = new Filter();
     filter.addWords('tea', 'cakes', 'pastries');
     const Token = await AsyncStorage.getItem('token');
-    console.log(overall_rating)
-    fetch("http://10.0.2.2:3333/api/1.0.0/location/"+id+"/review",
+    console.log(overallRating);
+    fetch(`http://10.0.2.2:3333/api/1.0.0/location/${id}/review`,
       {
         method: 'post',
         headers: {
-          'X-Authorization' : Token,
-          "Content-Type": "application/json"
+          'X-Authorization': Token,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          overall_rating: overall_rating,
-          price_rating: price_rating,
-          quality_rating: quality_rating,
-          clenliness_rating: clenliness_rating,
-          review_body: filter.clean(review_body)
+          overall_rating: overallRating,
+          price_rating: priceRating,
+          quality_rating: qualityRating,
+          clenliness_rating: clenlinessRating,
+          review_body: filter.clean(reviewBody)
         }),
 
       })
-      .then ((res) => {
-        if (res.status === 201)
-        {
-          if (this.state.fileUri){
-            console.log('hi2')
-            this.getData()
-          }else{
-            navigation.push('Review', {id: id});}
-        }else if (res.status === 400){
-          throw 'Validation';
+      .then((res) => {
+        if (res.status === 201) {
+          if (this.state.fileUri) {
+            this.getData();
+          } else {
+            ToastAndroid.show('Review Added!', ToastAndroid.SHORT);
+            navigation.push('Review', { id }); 
+          }
+         } else if (res.status === 400) {
+          throw Error;
+        } else {
+          throw Error;
         }
-        else{
-          throw 'failed';
-        };
       })
-      .catch((message) => {console.log("error" + message)})
+      .catch((message) => { console.log(`error ${message}`); });
   }
 
   addPhoto = async () => {
-    console.log('hi3')
     const navigation = this.props.navigation;
-    let id = this.state.params;
-    let review_id = this.state.listData.review_id;
-    console.log(review_id)
+    const id = this.state.params;
+    const reviewId = this.state.listData.review_id;
     const Token = await AsyncStorage.getItem('token');
-    fetch("http://10.0.2.2:3333/api/1.0.0/location/"+id+"/review/"+review_id+"/photo",
+    fetch(`http://10.0.2.2:3333/api/1.0.0/location/${id}/review/${reviewId}/photo`,
       {
         method: 'post',
         headers: {
-          'X-Authorization' : Token,
-          "Content-Type": "image/jpeg"
+          'X-Authorization': Token,
+          'Content-Type': 'image/jpeg'
         },
         body: this.state.file
         })
-      .then ((res) => {
-        if (res.status === 200)
-        {
-          Alert.alert("hello photo uploaded")
-          navigation.push('Review', {id: id});
-        }else if (res.status === 400){
-          throw 'Validation';
+      .then((res) => {
+        if (res.status === 200) {
+          ToastAndroid.show('Photo uploaded!', ToastAndroid.SHORT);
+          navigation.push('Review', { id });
+        } else if (res.status === 400) {
+          throw Error;
+        } else {
+          throw Error;
         }
-        else{
-          throw 'failed';
-        };
       })
-      .catch((message) => {console.log("error" + message)})
+      .catch((message) => { console.log(`error ${message}`); });
   }
 
   handleOverall = (rating) => {
-    this.setState({isNull: true,
-                   overall_rating: rating})
+    this.setState({ isNull: true,
+                   overallRating: rating });
   }
   handlePrice = (rating) => {
-    this.setState({isNull: true,
-                   price_rating: rating})
+    this.setState({ isNull: true,
+                   priceRating: rating });
   }
 
   handleQuality = (rating) => {
-    this.setState({isNull: true,
-                   quality_rating: rating})
+    this.setState({ isNull: true,
+                   qualityRating: rating });
   }
 
   handleCleniness = (rating) => {
-    this.setState({isNull: true,
-                   clenliness_rating: rating})
+    this.setState({ isNull: true,
+                   clenlinessRating: rating });
   }
 
   handleBody = (text) => {
-    this.setState({isNull: true,
-                   review_body: text})
+    this.setState({ isNull: true,
+                   reviewBody: text });
+  }
+  
+  removeImage = () => {
+      this.setState({ fileUri: false });
   }
 
   renderFileUri() {
     if (this.state.fileUri) {
-      console.log('hello')
-      return <View><Image
+      return (<View><Image
         source={{ uri: this.state.fileUri }}
-        style={styles.images}/>
+        style={styles.images}
+      />
         <TouchableOpacity style={styles.appDeleteContainer} onPress={() => this.removeImage()}>
         <Text style={styles.appButtonText}> X </Text>
       </TouchableOpacity>
-      </View>
-    } else {
-      return <Image
+      </View>);
+    } 
+      return (<Image
+        // eslint-disable-next-line global-require
         source={require('../assets/dummy.png')}
         style={styles.images}
-      />
-    }
-  }
-  removeImage = () => {
-      this.setState({fileUri: false})
+      />);
   }
 
   render() {
@@ -214,74 +211,75 @@ getData = async () => {
             </Button>
               </Left>
               <Body>
-              <Title style={{fontWeight:'bold', fontSize:20}}>Add Review</Title>
-
+              <Title style={{ fontWeight: 'bold', fontSize: 20 }}>Add Review</Title>
               </Body>
-              <Right>
-              </Right>
+              <Right />
            </Header>
         <Content>
       <View style={styles.container}>
-      <Form style={{paddingLeft: 20, paddingRight:20}}>
-      <Item style={{marginTop:20}}>
+      <Form style={{ paddingLeft: 20, paddingRight: 20 }}>
+      <Item style={{ marginTop: 20 }}>
           <Text>
-          Overall Rating: {"\n"}
+          Overall Rating: {'\n'}
             <StarRating
                 containerStyle={styles.review}
                 starSize={25}
                 disabled={false}
                 maxStars={5}
-                rating={this.state.overall_rating}
+                rating={this.state.overallRating}
                 fullStarColor={'gold'}
-                selectedStar={(rating) => this.handleOverall(rating)}/>{"\n"}
+                selectedStar={(rating) => this.handleOverall(rating)}
+            />{'\n'}
 
-            Price Rating: {"\n"}
+            Price Rating: {'\n'}
               <StarRating
                 containerStyle={styles.review}
                 starSize={25}
                 disabled={false}
                 maxStars={5}
-                rating={this.state.price_rating}
+                rating={this.state.priceRating}
                 fullStarColor={'gold'}
-                selectedStar={(rating) => this.handlePrice(rating)}/>{"\n"}
+                selectedStar={(rating) => this.handlePrice(rating)}
+              />{'\n'}
 
-            Quality Rating: {"\n"}
+            Quality Rating: {'\n'}
               <StarRating
                 containerStyle={styles.review}
                 starSize={25}
                 disabled={false}
                 maxStars={5}
-                rating={this.state.quality_rating}
+                rating={this.state.qualityRating}
                 fullStarColor={'gold'}
-                selectedStar={(rating) => this.handleQuality(rating)}/>{"\n"}
+                selectedStar={(rating) => this.handleQuality(rating)}
+              />{'\n'}
 
-            Clenliness Rating: {"\n"}
+            Clenliness Rating: {'\n'}
               <StarRating
                 containerStyle={styles.review}
                 starSize={25}
                 disabled={false}
                 maxStars={5}
-                rating={this.state.clenliness_rating}
+                rating={this.state.clenlinessRating}
                 fullStarColor={'gold'}
-                selectedStar={(rating) => this.handleCleniness(rating)}/>{"\n"}
+                selectedStar={(rating) => this.handleCleniness(rating)}
+              />{'\n'}
             </Text>
             </Item>
-            <Item style={{marginTop:20}}>
+            <Item style={{ marginTop: 20 }}>
             <Text>
-            Review/Comment: {"\n"}
+            Review/Comment: {'\n'}
             </Text></Item>
             <Item>
             <Input
                 placeholder="Review away..."
-                multiline={true}
-                value={this.state.review_body}
-                onChangeText={(value) => this.handleBody(value)}/></Item>
-
+                multiline
+                value={this.state.reviewBody}
+                onChangeText={(value) => this.handleBody(value)}
+            /></Item>
             {this.state.isNull ? null :
-            <Text style={{paddingLeft: 20, paddingRight:20, color:'red'}}>{this.state.errorLength}</Text>}
+            <Text style={{ paddingLeft: 20, paddingRight: 20, color: 'red' }}>
+            {this.state.errorLength}</Text>}
                 
-        
-
       <TouchableOpacity style={styles.appButtonContainer} onPress={() => this.addreview()}>
       
       <Text style={styles.appButtonText}> Add </Text>
@@ -313,7 +311,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   appDeleteContainer: {
-    backgroundColor: "red",
+    backgroundColor: 'red',
     width: 50,
     marginTop: 10,
     elevation: 3,
@@ -325,17 +323,17 @@ const styles = StyleSheet.create({
   appButtonContainer: {
     marginTop: 10,
     elevation: 8,
-    backgroundColor: "#009688",
+    backgroundColor: '#009688',
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 12,
   },
   appButtonText: {
     fontSize: 18,
-    color: "white",
-    fontWeight: "bold",
-    alignSelf: "center",
-    textTransform: "uppercase"
+    color: 'white',
+    fontWeight: 'bold',
+    alignSelf: 'center',
+    textTransform: 'uppercase'
   },
   scrollView: {
     backgroundColor: Colors.lighter,
@@ -365,4 +363,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default AddReview
+export default AddReview;

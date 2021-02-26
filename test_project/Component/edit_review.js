@@ -1,26 +1,28 @@
+/* eslint-disable no-undef */
 import React, { Component } from 'react';
-import { TextInput, View, StyleSheet, Alert, TouchableOpacity, Image } from 'react-native';
+import { ToastAndroid, View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Container, Form, Header, Title, CardItem, Input, Text, Button, Icon, Left, Body, Right, Item, Content } from 'native-base';
+import { Container, Form, Header, Title, Input, Text, Button, Icon, 
+         Left, Body, Right, Item, Content } from 'native-base';
 import * as ImagePicker from 'react-native-image-picker';
-
+import Filter from 'bad-words';
 
 class EditReview extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
-    console.log(props)
+    console.log(props);
     this.state = {
-      overall_rating: props.route.params.review.overall_rating,
-      price_rating: props.route.params.review.price_rating,
-      quality_rating: props.route.params.review.quality_rating,
-      clenliness_rating: props.route.params.review.clenliness_rating,
-      review_body: props.route.params.review.review_body,
-      review_id: props.route.params.review.review_id,
-      location_id: props.route.params.loc_id,
+      overallRating: props.route.params.review.overall_rating,
+      priceRating: props.route.params.review.price_rating,
+      qualityRating: props.route.params.review.quality_rating,
+      clenlinessRating: props.route.params.review.clenliness_rating,
+      reviewBody: props.route.params.review.review_body,
+      reviewId: props.route.params.review.review_id,
+      locationId: props.route.params.loc_id,
       isNull: true,
-      response_url: '',
-      error:'',
+      responseUrl: '',
+      error: '',
       file: {},
       photo: false,
       isloading: true
@@ -29,144 +31,136 @@ class EditReview extends Component {
 
   componentDidMount() {
     this.getphoto();
-   
   }
+
+  getphoto = async () => {
+    const value = await AsyncStorage.getItem('token');
+    const { reviewId, locationId } = this.state;
+   
+    return fetch(`http://10.0.2.2:3333/api/1.0.0/location/${locationId}/review/${reviewId}/photo`, {
+      method: 'GET',
+      headers: {
+      'X-Authorization': value
+    },
+  })
+      .then((res) => {
+        if (res.status === 200) {
+          console.log('success');
+          this.setState({ 
+            isloading: false, photo: true, responseUrl: `${res.url}?time=${new Date()}` });
+        } else if (res.status === 401) {
+          console.log('error');
+        } else if (res.status === 404) {
+         console.log('missing');
+         this.setState({ photo: false, isloading: false });
+        } else {
+          console.log('forbidden');
+        }
+      });
+    }
 
   editreview = async () => {
     const navigation = this.props.navigation;
-    let {review_id, location_id, overall_rating, price_rating, quality_rating, clenliness_rating, review_body, response_url, photo} = this.state;
+    const { reviewId, locationId, overallRating, priceRating, qualityRating, clenlinessRating, 
+         reviewBody, responseUrl, photo } = this.state;
     const Token = await AsyncStorage.getItem('token');
-    if (review_body.length == 0){
-      this.setState({error: 'Review box empty!',
-                     isNull: false})
-      return false
+    if (reviewBody.length === 0) {
+      this.setState({ error: 'Review box empty!',
+                     isNull: false });
+      return false;
     }
 
-    if (response_url == false && photo == true){
-      this.deletePhoto()
-    } else if (response_url && photo == false){
-      console.log(this.state.file)
-      console.log('helloooooooo')
-      this.addPhoto()
+    if (responseUrl === false && photo === true) {
+      this.deletePhoto();
+    } else if (responseUrl && photo === false) {
+      console.log(this.state.file);
+      this.addPhoto();
     }
-    var Filter = require('bad-words'),
-    filter = new Filter();
+    const filter = new Filter();
     filter.addWords('tea', 'cakes', 'pastries');
-    console.log(overall_rating)
-    return fetch("http://10.0.2.2:3333/api/1.0.0/location/"+location_id+"/review/"+review_id,
+    console.log(overallRating);
+    return fetch(`http://10.0.2.2:3333/api/1.0.0/location/${locationId}/review/${reviewId}`,
       {
         method: 'patch',
         headers: {
-          'X-Authorization' : Token,
-          "Content-Type": "application/json"
+          'X-Authorization': Token,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          overall_rating: overall_rating,
-          price_rating: price_rating,
-          quality_rating: quality_rating,
-          clenliness_rating: clenliness_rating,
-          review_body: filter.clean(review_body)
+          overall_rating: overallRating,
+          price_rating: priceRating,
+          quality_rating: qualityRating,
+          clenliness_rating: clenlinessRating,
+          review_body: filter.clean(reviewBody)
         }),
 
       })
-      .then ((res) => {
-        if (res.status === 200)
-        {
-          navigation.push('Review', {id: location_id});
+      .then((res) => {
+        if (res.status === 200) {
+          ToastAndroid.show('Review Edited!', ToastAndroid.SHORT);
+          navigation.push('Review', { id: locationId });
           return res.json();
-        }else if (res.status === 400){
-          throw 'Validation';
+        } else if (res.status === 400) {
+          throw Error;
+        } else {
+          throw Error;
         }
-        else{
-          throw 'failed';
-        };
       })
-      .then ((responseJson) => {
+      .then((responseJson) => {
         console.log(responseJson);
       })
-      .catch((message) => {console.log("error" + message)})
+      .catch((message) => { console.log(`error ${message}`); });
   }
 
 
   addPhoto = async () => {
-    let {location_id, review_id} = this.state;
-    console.log(review_id)
+    const { locationId, reviewId } = this.state;
+    console.log(reviewId);
     const Token = await AsyncStorage.getItem('token');
-    return fetch("http://10.0.2.2:3333/api/1.0.0/location/"+location_id+"/review/"+review_id+"/photo",
+    return fetch(`http://10.0.2.2:3333/api/1.0.0/location/${locationId}/review/${reviewId}/photo`,
       {
         method: 'post',
         headers: {
-          'X-Authorization' : Token,
-          "Content-Type": "image/jpeg"
+          'X-Authorization': Token,
+          'Content-Type': 'image/jpeg'
         },
         body: this.state.file
         })
-      .then ((res) => {
-        if (res.status === 200)
-        {
-        }else if (res.status === 400){
-          throw 'Validation';
+      .then((res) => {
+        if (res.status === 200) {
+          ToastAndroid.show('Photo Uploaded!', ToastAndroid.SHORT);
+        } else if (res.status === 400) {
+          throw Error;
+        } else {
+          throw Error;
         }
-        else{
-          throw 'failed';
-        };
       })
-      .catch((message) => {console.log("error" + message)})
+      .catch((message) => { console.log(`error ${message}`); });
   }
 
   deletePhoto = async () => {
     const value = await AsyncStorage.getItem('token');
-    let {review_id, location_id} = this.state;
-    return fetch("http://10.0.2.2:3333/api/1.0.0/location/"+location_id+"/review/"+review_id+"/photo", 
+    const { reviewId, locationId } = this.state;
+    return fetch(`http://10.0.2.2:3333/api/1.0.0/location/${locationId}/review/${reviewId}/photo`, 
     {
       method: 'DELETE',
       headers: {
-        'X-Authorization' : value
+        'X-Authorization': value
       },
     })
-      .then ((res) => {
-        if (res.status === 200)
-        {
-        }else if (res.status === 401){
-          this.props.navigation.navigate("Review")
+      .then((res) => {
+        if (res.status === 200) {
+          console.log(res);
+        } else if (res.status === 401) {
+          this.props.navigation.navigate('Review');
+        } else {
+          throw error;
         }
-        else{
-          throw 'failed';
-        }
-      })
+      }).catch((message) => { console.log(`error ${message}`); });
   };
 
-  getphoto = async () => {
-  const value = await AsyncStorage.getItem('token');
-  let {review_id, location_id} = this.state;
- 
-  return fetch("http://10.0.2.2:3333/api/1.0.0/location/"+location_id+"/review/"+review_id+"/photo",{
-    method: "GET",
-    headers: {
-    'X-Authorization' : value
-  },
-})
-    .then ((res) => {
-      if (res.status === 200)
-      {
-        console.log('success')
-        this.setState({isloading: false, photo:true, response_url: res.url+ "?time=" + new Date()})
-        
-      }else if (res.status === 401){
-        console.log('error')
-      }
-      else if (res.status === 404){
-       console.log('missing')
-       this.setState({photo:false, isloading: false})
-
-      } else{
-        console.log('forbidden')
-      }
-    })
-  }
-
   cameraLaunch = () => {
-    let options = {
+    const options = {
       storageOptions: {
         skipBackup: true,
         path: 'images',
@@ -186,8 +180,8 @@ class EditReview extends Component {
         console.log('response', JSON.stringify(response.uri));
         this.setState({
           file: response,
-          response_url: response.uri,
-          photo:false
+          responseUrl: response.uri,
+          photo: false
         });
       }
     });
@@ -195,65 +189,65 @@ class EditReview extends Component {
   
 
   handleOverall = (rating) => {
-    this.setState({isNull: true,
-                   overall_rating: rating})
+    this.setState({ isNull: true,
+                   overallRating: rating });
   }
   handlePrice = (rating) => {
-    this.setState({isNull: true,
-                   price_rating: rating})
+    this.setState({ isNull: true,
+                   priceRating: rating });
   }
 
   handleQuality = (rating) => {
-    this.setState({isNull: true,
-                   quality_rating: rating})
+    this.setState({ isNull: true,
+                   qualityRating: rating });
   }
 
   handleCleniness = (rating) => {
-    this.setState({isNull: true,
-                   clenliness_rating: rating})
+    this.setState({ isNull: true,
+                   clenlinessRating: rating });
   }
 
   handleBody = (text) => {
-    this.setState({isNull: true,
-                   review_body: text})
+    this.setState({ isNull: true,
+                   reviewBody: text });
   }
   removeImage = () => {
-    this.setState({response_url: false})
+    this.setState({ responseUrl: false });
 }
   
   starRating(rating) {
-    return <StarRating
+    return (<StarRating
               containerStyle={styles.review}
               starSize={20}
-              disabled={true}
+              disabled
               maxStars={5}
               rating={rating}
-              fullStarColor={'gold'}/>
+              fullStarColor={'gold'}
+    />);
   }
 
   renderFileUri() {
-    if (this.state.response_url) {
-      console.log('hello')
-      return <View><Image
-        source={{ uri: this.state.response_url }}
-        style={styles.images}/>
+    if (this.state.responseUrl) {
+      return (<View><Image
+        source={{ uri: this.state.responseUrl }}
+        style={styles.images}
+      />
         <TouchableOpacity style={styles.close} onPress={() => this.removeImage()}>
         <Icon name="ios-close-circle" size={25} />
         </TouchableOpacity>
-      </View>
-    } else {
+      </View>);
     }
   }
 
 
   render() {
-    if (this.state.isloading){
+    if (this.state.isloading) {
       return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           <Text>Loading..</Text>  
         </View>
-      )
-    } else{
+      );
+    }
     return (
       <Container>
         <Content>
@@ -264,68 +258,74 @@ class EditReview extends Component {
             </Button>
           </Left>
           <Body>
-        <Title style={{fontWeight:'bold', fontSize:20}}>Edit Review</Title>
+        <Title style={{ fontWeight: 'bold', fontSize: 20 }}>Edit Review</Title>
         </Body>
-        <Right></Right>
+        <Right />
         </Header>
       <View style={styles.container}>
-      <Form style={{paddingLeft: 20, paddingRight:20}}>
-      <Item style={{marginTop:20}}>
+      <Form style={{ paddingLeft: 20, paddingRight: 20 }}>
+      <Item style={{ marginTop: 20 }}>
           <Text>
-          Overall Rating: {"\n"}
+          Overall Rating: {'\n'}
             <StarRating
                 containerStyle={styles.review}
                 starSize={25}
                 disabled={false}
                 maxStars={5}
-                rating={this.state.overall_rating}
+                rating={this.state.overallRating}
                 fullStarColor={'gold'}
-                selectedStar={(rating) => this.handleOverall(rating)}/>{"\n"}
+                selectedStar={(rating) => this.handleOverall(rating)}
+            />{'\n'}
 
-            Price Rating: {"\n"}
+            Price Rating: {'\n'}
               <StarRating
                 containerStyle={styles.review}
                 starSize={25}
                 disabled={false}
                 maxStars={5}
-                rating={this.state.price_rating}
+                rating={this.state.priceRating}
                 fullStarColor={'gold'}
-                selectedStar={(rating) => this.handlePrice(rating)}/>{"\n"}
+                selectedStar={(rating) => this.handlePrice(rating)}
+              />{'\n'}
 
-            Quality Rating: {"\n"}
+            Quality Rating: {'\n'}
               <StarRating
                 containerStyle={styles.review}
                 starSize={25}
                 disabled={false}
                 maxStars={5}
-                rating={this.state.quality_rating}
+                rating={this.state.qualityRating}
                 fullStarColor={'gold'}
-                selectedStar={(rating) => this.handleQuality(rating)}/>{"\n"}
+                selectedStar={(rating) => this.handleQuality(rating)}
+              />{'\n'}
 
-            Clenliness Rating: {"\n"}
+            Clenliness Rating: {'\n'}
               <StarRating
                 containerStyle={styles.review}
                 starSize={25}
                 disabled={false}
                 maxStars={5}
-                rating={this.state.clenliness_rating}
+                rating={this.state.clenlinessRating}
                 fullStarColor={'gold'}
-                selectedStar={(rating) => this.handleCleniness(rating)}/>{"\n"}
+                selectedStar={(rating) => this.handleCleniness(rating)}
+              />{'\n'}
             </Text>
             </Item>
-            <Item style={{marginTop:20}}>
+            <Item style={{ marginTop: 20 }}>
             <Text>
-            Review/Comment: {"\n"}
+            Review/Comment: {'\n'}
             </Text>
             </Item>
             <Item>
             <Input
                 placeholder="Review away..."
-                multiline={true}
-                onChangeText={(value) =>this.handleBody(value)}
-                value={this.state.review_body}/></Item>
+                multiline
+                onChangeText={(value) => this.handleBody(value)}
+                value={this.state.reviewBody}
+            /></Item>
             {this.state.isNull ? null :
-            <Text style={{paddingLeft: 20, paddingRight:20, color:'red'}}>{this.state.errorLength}</Text>}
+            <Text style={{ paddingLeft: 20, paddingRight: 20, color: 'red' }}>
+              {this.state.errorLength}</Text>}
         
 
       <TouchableOpacity style={styles.appButtonContainer} onPress={() => this.editreview()}>
@@ -349,7 +349,6 @@ class EditReview extends Component {
     );
   }
 }
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -363,14 +362,14 @@ const styles = StyleSheet.create({
   },
   close: {
     margin: 5,
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     right: 0,
     width: 25,
     height: 25,
   },
   appDeleteContainer: {
-    backgroundColor: "red",
+    backgroundColor: 'red',
     width: 50,
     marginTop: 10,
     elevation: 3,
@@ -380,19 +379,19 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
   },
   appButtonContainer: {
-    marginTop:20,
+    marginTop: 20,
     elevation: 8,
-    backgroundColor: "#009688",
+    backgroundColor: '#009688',
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 12
   },
   appButtonText: {
     fontSize: 18,
-    color: "white",
-    fontWeight: "bold",
-    alignSelf: "center",
-    textTransform: "uppercase"
+    color: 'white',
+    fontWeight: 'bold',
+    alignSelf: 'center',
+    textTransform: 'uppercase'
   },
   images: {
     width: 150,
@@ -404,4 +403,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default EditReview
+export default EditReview;

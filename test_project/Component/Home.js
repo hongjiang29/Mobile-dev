@@ -1,12 +1,14 @@
+/* eslint-disable no-undef */
 import React, { Component } from 'react';
-import { View, TouchableOpacity, ToastAndroid, FlatList, StyleSheet,SafeAreaView, StatusBar, Alert, Image } from 'react-native';
-import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right, Title } from 'native-base';
+import { View, TouchableOpacity, ToastAndroid, FlatList, StyleSheet, StatusBar, Image }
+from 'react-native';
+import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left,
+         Body, Right, Title } from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StarRating from 'react-native-star-rating';
 
-class Home extends Component{
-
-  constructor(props){
+class Home extends Component {
+  constructor(props) {
     super(props);
     // the components state
     this.state = {
@@ -28,190 +30,175 @@ class Home extends Component{
     this.unsubscribe();
   }
 
-  checkLoggedIn = async () => {
+  getFavourite = async () => {
     const value = await AsyncStorage.getItem('token');
-    if (value == null) {
-      this.props.navigation.navigate('Login')
-    }
-  }
-
-  favourite = async (location_id) => {
-    const value = await AsyncStorage.getItem('token');
-    return fetch("http://10.0.2.2:3333/api/1.0.0/location/"+location_id+"/favourite", 
+    const userId = await AsyncStorage.getItem('id');
+    return fetch(`http://10.0.2.2:3333/api/1.0.0/user/${userId}`, 
     {
-      method: 'POST',
+      method: 'GET',
       headers: {
-        'X-Authorization' : value
+        'X-Authorization': value
       },
     })
-      .then ((res) => {
-        if (res.status === 200)
-        {
-          var joined = this.state.favouritePlaces.concat(location_id);
-          this.setState({ favouritePlaces: joined })
-          ToastAndroid.show('Favourited!', ToastAndroid.SHORT)
+      .then((res) => {
+        if (res.status === 200) {
           return res.json();
-        }else if (res.status === 401){
-          this.props.navigation.navigate("Login")
-        }
-        else{
-          throw 'failed';
+        } else if (res.status === 401) {
+          ToastAndroid.show("Your're not logged in", ToastAndroid.SHORT);
+          this.props.navigation.navigate('Login');
+        } else {
+          throw Error;
         }
       })
-
-      .catch((message) => {console})
-};
-
-unfavourite = async (location_id) => {
-  const value = await AsyncStorage.getItem('token');
-  return fetch("http://10.0.2.2:3333/api/1.0.0/location/"+location_id+"/favourite", 
-  {
-    method: 'DELETE',
-    headers: {
-      'X-Authorization' : value
-    },
-  })
-    .then ((res) => {
-      if (res.status === 200)
-      {
-        const array = [...this.state.favouritePlaces]; // make a separate copy of the array
-        const index = array.indexOf(location_id)
-      if (index !== -1) {
-        array.splice(index, 1);
-        this.setState({favouritePlaces: array});
+      .then((responseJson) => {
+        const favs = (responseJson.favourite_locations);
+        this.setState({
+          favouritePlaces: []
+        });
+        favs.forEach(element => {
+          this.setState({
+            favouritePlaces: [...this.state.favouritePlaces, element.location_id]
+        });
+    });
+    console.log(this.state.favouritePlaces);
+        }).catch((message) => { console.log(`error ${message}`); });
       }
-      console.log(this.state.favouritePlaces)
-      ToastAndroid.show('Unfavourited!', ToastAndroid.SHORT)
-      }else if (res.status === 401){
-        this.props.navigation.navigate("Login")
-      }
-      else{
-        throw 'failed';
-      }
-    })
-    .then ((responseJson) => {
-      console.log(responseJson)
-        
-      })
-    .catch((message) => {console})
-};
 
   getData = async () => {
     const value = await AsyncStorage.getItem('token');
-    return fetch("http://10.0.2.2:3333/api/1.0.0/find", 
+    return fetch('http://10.0.2.2:3333/api/1.0.0/find', 
     {
       headers: {
-        'X-Authorization' : value
+        'X-Authorization': value
       },
     })
-      .then ((res) => {
-        if (res.status === 200)
-        {
+      .then((res) => {
+        if (res.status === 200) {
           return res.json();
-        }else if (res.status === 401){
-          ToastAndroid.show("Your're not logged in", ToastAndroid.SHORT)
-          this.props.navigation.navigate("Login")
-        }
-        else{
-          throw 'failed';
+        } else if (res.status === 401) {
+          ToastAndroid.show("Your're not logged in", ToastAndroid.SHORT);
+          this.props.navigation.navigate('Login');
+        } else {
+          throw Error;
         }
       })
-      .then ((responseJson) => {
+      .then((responseJson) => {
           this.setState({
             isLoading: false,
             listData: responseJson
-          })
-          
-        })
-      .catch((message) => {console})
+          });
+        }).catch((message) => { console.log(`error ${message}`); });
 };
 
-checkFavourite(location_id){
-  console.log(location_id)
-  if (this.state.favouritePlaces.includes(location_id)) {
-    return true
-  } else {
-    return false
-  }
-}
+  favourite = async (locationId) => {
+    const value = await AsyncStorage.getItem('token');
+    return fetch(`http://10.0.2.2:3333/api/1.0.0/location/${locationId}/favourite`, 
+    {
+      method: 'POST',
+      headers: {
+        'X-Authorization': value
+      },
+    })
+      .then((res) => {
+        if (res.status === 200) {
+          const joined = this.state.favouritePlaces.concat(locationId);
+          this.setState({ favouritePlaces: joined });
+          ToastAndroid.show('Favourited!', ToastAndroid.SHORT);
+          return res.json();
+        } else if (res.status === 401) {
+          this.props.navigation.navigate('Login');
+        } else {
+          throw Error;
+        }
+      }).catch((message) => { console.log(`error ${message}`); });
+};
 
-getFavourite = async () => {
+unfavourite = async (locationId) => {
   const value = await AsyncStorage.getItem('token');
-  const userId = await AsyncStorage.getItem('id');
-  return fetch("http://10.0.2.2:3333/api/1.0.0/user/"+ userId, 
+  return fetch(`http://10.0.2.2:3333/api/1.0.0/location/${locationId}/favourite`, 
   {
-    method: "GET",
+    method: 'DELETE',
     headers: {
-      'X-Authorization' : value
+      'X-Authorization': value
     },
   })
-    .then ((res) => {
-      if (res.status === 200)
-      {
-        return res.json();
-      }else if (res.status === 401){
-        ToastAndroid.show("Your're not logged in", ToastAndroid.SHORT)
-        this.props.navigation.navigate("Login")
+    .then((res) => {
+      if (res.status === 200) {
+        const array = [...this.state.favouritePlaces]; // make a separate copy of the array
+        const index = array.indexOf(locationId);
+      if (index !== -1) {
+        array.splice(index, 1);
+        this.setState({ favouritePlaces: array });
       }
-      else{
-        throw 'failed';
+      console.log(this.state.favouritePlaces);
+      ToastAndroid.show('Unfavourited!', ToastAndroid.SHORT);
+      } else if (res.status === 401) {
+        this.props.navigation.navigate('Login');
+      } else {
+        throw Error;
       }
-    })
-    .then ((responseJson) => {
-      const favs = (responseJson.favourite_locations);
-      this.setState({
-        favouritePlaces: []
-      });
-      favs.forEach(element => {
-        this.setState({
-          favouritePlaces: [...this.state.favouritePlaces, element.location_id]
-      });
-  })
-  console.log(this.state.favouritePlaces)
-      })
-    .catch((message) => {console})
-}
+    }).then((responseJson) => {
+      console.log(responseJson);
+      }).catch((message) => { console.log(`error ${message}`); });
+};
 
-  renderAuthButton = (location_id) => {
-    let bool = this.checkFavourite(location_id)
-    console.log(bool)
-    if (bool == true) {
-    return <Button transparent onPress={() => this.unfavourite(location_id)}>
-            <Icon active name="heart" />
-            <Text>UnFavourite</Text>
-          </Button>
-  } else {
-    return <Button transparent onPress={() => this.favourite(location_id)}>
-            <Icon active name="heart-outline" />
-            <Text>Favourite</Text>
-          </Button>
+
+checkLoggedIn = async () => {
+  const value = await AsyncStorage.getItem('token');
+  if (value == null) {
+    this.props.navigation.navigate('Login');
   }
 }
 
-    render()  {
-        if (this.state.isLoading){
+checkFavourite(locationId) {
+  console.log(locationId);
+  if (this.state.favouritePlaces.includes(locationId)) {
+    return true;
+  } 
+    return false;
+}
+
+
+  renderAuthButton = (locationId) => {
+    const bool = this.checkFavourite(locationId);
+    console.log(bool);
+    if (bool === true) {
+    return (<Button transparent onPress={() => this.unfavourite(locationId)}>
+            <Icon active name="heart" />
+            <Text>UnFavourite</Text>
+          </Button>);
+  } 
+    return (<Button transparent onPress={() => this.favourite(locationId)}>
+            <Icon active name="heart-outline" />
+            <Text>Favourite</Text>
+          </Button>);
+}
+
+    render() {
+        if (this.state.isLoading) {
           return (
-  
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
               <Text>Loading..</Text>  
             </View>
           );
-        } else{
-        
+        }
           return (
             <Container>
               <Header>
-              <Title style={{fontWeight:'bold', fontSize:20, alignSelf: 'center'}}>HOME</Title>
+              <Title style={{ fontWeight: 'bold', fontSize: 20, alignSelf: 'center' }}>HOME</Title>
               </Header>
               <FlatList
                 data={this.state.listData}
                 renderItem={({ item }) => (
-                  <TouchableOpacity onPress={() => this.props.navigation.navigate('Review', {id: item.location_id})}>
+                  <TouchableOpacity
+                  onPress={() => this.props.navigation.navigate('Review', 
+                                                                { id: item.location_id })}
+                  >
                   <Content>
                   <Card>
                     <CardItem>
                       <Left>
-                        <Thumbnail source={{uri: 'https://picsum.photos/id/237/200/300'}} />
+                        <Thumbnail source={{ uri: 'https://picsum.photos/id/237/200/300' }} />
                         <Body>
                           <Text>{item.location_name}</Text>
                           <Text note>{item.location_town}</Text>
@@ -219,23 +206,26 @@ getFavourite = async () => {
                       </Left>
                     </CardItem>
                     <CardItem cardBody>
-                      <Image source={{uri: 'https://picsum.photos/seed/picsum/200/300'}} style={{height: 200, width: null, flex: 1}}/>
+                      <Image 
+                      source={{ uri: item.photo_path }} 
+                      style={{ height: 200, width: null, flex: 1 }} 
+                      />
                     </CardItem>
                     <CardItem>
                       <Left>
                       {this.renderAuthButton(item.location_id)}
                       </Left>
-                      <Body>
-                      </Body>
+                      <Body />
                       <Right>
                       <Text>
                         <StarRating
                           containerStyle={styles.review}
                           starSize={25}
-                          disabled={true}
+                          disabled
                           maxStars={5}
                           rating={item.avg_overall_rating}
-                          fullStarColor={'gold'}/>
+                          fullStarColor={'gold'} 
+                        />
                         </Text>
                       </Right>
                     </CardItem>
@@ -244,14 +234,13 @@ getFavourite = async () => {
                   </TouchableOpacity>
                   )}
                   
-                  keyExtractor={(item,index) => item.location_id.toString()}
-        /> 
+                  keyExtractor={(item) => item.location_id.toString()}
+              /> 
 
             </Container>
           );
         }
         }
-    }
     const styles = StyleSheet.create({
       container: {
         flex: 1,
@@ -259,10 +248,10 @@ getFavourite = async () => {
       },
       appButtonText: {
         fontSize: 18,
-        color: "black",
-        fontWeight: "bold",
-        alignSelf: "center",
-        textTransform: "uppercase"
+        color: 'black',
+        fontWeight: 'bold',
+        alignSelf: 'center',
+        textTransform: 'uppercase'
       },
       separatorLine: {
         height: 1,
@@ -278,10 +267,7 @@ getFavourite = async () => {
         color: 'white',
         fontSize: 25
       },
-    
-      
-    
     });
   
 
-export default Home
+export default Home;
