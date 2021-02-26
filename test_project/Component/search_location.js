@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { View, TouchableOpacity, ToastAndroid, FlatList, 
          PermissionsAndroid, Image } from 'react-native';
 import { Container, Header, Input, Card, CardItem, Item, Text, Button, Icon, 
-         Left, Body, Right, Content, Thumbnail } from 'native-base';
+         Left, Body, Right, Content, Thumbnail, Spinner } from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StarRating from 'react-native-star-rating';
 import Geolocation from '@react-native-community/geolocation';
@@ -155,7 +155,7 @@ class searchLocation extends Component {
           return (
   
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-              <Text>Loading..</Text>  
+              <Spinner color='black' />  
             </View>
           );
         } 

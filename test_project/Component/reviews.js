@@ -5,7 +5,8 @@ import { View, FlatList, TouchableOpacity, Image, ToastAndroid } from 'react-nat
 import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Container, Header, Card, CardItem, Text, Button, Icon, Left, 
-         Body, Right, Title, Subtitle, Item } from 'native-base';
+         Body, Right, Title, Subtitle, Item, Spinner } from 'native-base';
+import Tts from 'react-native-tts';
 import { review, main } from '../css/styles';
 
 class Reviews extends Component {
@@ -241,12 +242,16 @@ deleteReview = async (locationId, reviewId) => {
     />);
   }
 
+  speechToText = (text) => {
+    Tts.speak(text);
+  }
+
   renderFileUri(reviewId) {
     console.log(this.state.photo);
     if (this.state.photo[reviewId]) {
       return (<Image 
       source={{ uri: this.state.photo[reviewId] }} 
-      style={{ height: 200, width: null, flex: 1 }}
+      style={{ height: 400, width: null, flex: 1, marginHorizontal: 3 }}
       />);
     } 
     }
@@ -288,18 +293,18 @@ deleteReview = async (locationId, reviewId) => {
           </Button>);
   }
   }
+
     render() {
         if (this.state.isLoading) {
             return (
               <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <Text>Loading..</Text>  
+                <Spinner color='black' />   
               </View>
             );
           } 
             const itemFirst = this.state.listData;
             const locId = itemFirst.location_id;
         return (
-          
           <Container>
             <Header>
             <Left>
@@ -315,9 +320,8 @@ deleteReview = async (locationId, reviewId) => {
               <TouchableOpacity 
               activeOpacity={0.7} style={main.appButtonContainer} onPress={() => 
               this.props.navigation.push('AddReview', { id: this.state.params })}
-              >
-                    
-              <Text style={main.appButtonText}> + </Text>
+              >    
+              <Icon active name="pencil-outline" />
               </TouchableOpacity>
               </Right>
            </Header>
@@ -325,27 +329,39 @@ deleteReview = async (locationId, reviewId) => {
                   <CardItem>
                     <Item>
                     <Left>
-                      <Text>
-                      Price Rating:
+                      <View>
+                      <View style={{ justiftyContent: 'center', alignItems: 'center' }}>
+                      <Icon active name="ios-cash-outline" />
+                      </View>
+                      <Text style={review.textrating}>
                       {this.starRating(itemFirst.avg_price_rating)}  
                     </Text>
+                    </View>
                     </Left>
                     <Body>
-                      <Text>
-                        Quality Rating:     
+                    <View>
+                      <View style={{ justiftyContent: 'center', alignItems: 'center' }}>
+                      <Icon active name="cellular" />
+                      </View>
+                      <Text style={review.textratingIcon}>  
                         {this.starRating(itemFirst.avg_quality_rating)}
                       </Text>
+                      </View>
                     </Body>
                     <Right>
-                        <Text>Hygiene Rating:
-                        {this.starRating(itemFirst.avg_clenliness_rating)}
+                      <View>
+                      <View style={{ justiftyContent: 'center', alignItems: 'center' }}>
+                        <Icon active name="md-water" />
+                      </View>
+                      <Text style={review.textratingIcon}>
+                      {this.starRating(itemFirst.avg_clenliness_rating)}
                     </Text>
+                    </View>
                     </Right>
                     </Item>
                   </CardItem>
                     </Card>
-                    <Text style={{ left: 30, top: 5, fontWeight: 'bold', paddingBottom: 10 }}>
-                     Reviews: </Text>
+                    
                     <FlatList
                     data={itemFirst.location_reviews}
                     renderItem={({ item }) => (
@@ -384,8 +400,13 @@ deleteReview = async (locationId, reviewId) => {
                       {this.renderFileUri(item.review_id)}
                     </CardItem>
                     <CardItem>
+                      <View>
                     <Text style={review.text}>
                       Comment: {item.review_body}{'\n'}</Text>
+                      <TouchableOpacity onPress={() => this.speechToText(item.review_body)}>
+                      <Icon active name="volume-high-outline" />
+                      </TouchableOpacity>
+                      </View>
                     </CardItem>
                     <CardItem>
                       <Left>

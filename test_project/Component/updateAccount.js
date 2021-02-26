@@ -6,7 +6,7 @@ import React, { Component } from 'react';
 import { View, Image, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Container, Form, Input, Text, Item, Header, Title } from 'native-base';
-import { main } from '../css/styles';
+import { main, update } from '../css/styles';
 
 class updateAccount extends Component {
   constructor(props) {
@@ -55,17 +55,17 @@ class updateAccount extends Component {
             if (res.status === 200) {
               this.props.navigation.push('Home');
             } else if (res.status === 400) {
-              this.setState({ errorLength: 'User already exists!',
+              this.setState({ errorLength: 'Some of you information is incorrect!',
                          isNull: false });
-              throw Error;
+              console.log(res);
             } else {
-              throw Error;
+              console.log(res);
             }
           });
         } catch (error) {
-        console.error(error);
-      }
+          throw error;
 }
+  }
 
 handleFirstname = (text) => {
   this.setState({ isNull: true,
@@ -110,8 +110,9 @@ handleEmail = (text) => {
     return (
       <Container>
       <Header>
-        <Title style={{ fontWeight: 'bold', fontSize: 20, alignSelf: 'center' }}>ACCOUNT</Title>
+        <Title style={main.headerText}>ACCOUNT</Title>
       </Header>
+      <View style={update.container}>
       <View style={{ alignItems: 'center', margin: 20 }}>
 
       <Image 
@@ -121,7 +122,7 @@ handleEmail = (text) => {
 
       </View>
       <Form style={{ paddingLeft: 20, paddingRight: 20 }}>
-      <Item style={{ marginTop: 20 }}>
+      <Item rounded style={{ marginTop: 20 }}>
         
         <Input
           underlineColorAndroid="transparent"
@@ -130,7 +131,7 @@ handleEmail = (text) => {
           onChangeText={this.handleFirstname} value={this.state.firstName}
         /></Item>
         
-        <Item style={{ marginTop: 20 }}>
+        <Item rounded style={{ marginTop: 20 }}>
         <Input
           underlineColorAndroid="transparent"
           placeholder="Enter your last name here"
@@ -138,7 +139,7 @@ handleEmail = (text) => {
           onChangeText={this.handleLastname} value={this.state.lastName}
         /></Item>
 
-        <Item style={{ marginTop: 20 }}>
+        <Item rounded style={{ marginTop: 20 }}>
         <Input
           underlineColorAndroid="transparent"
           placeholder="Enter your new email here"
@@ -150,7 +151,7 @@ handleEmail = (text) => {
         <Text style={{ paddingLeft: 20, paddingRight: 20, color: 'red' }}>
                     {this.state.errorEmail}</Text>}
 
-        <Item style={{ marginTop: 20 }}>
+        <Item rounded style={{ marginTop: 20 }}>
         <Input
           underlineColorAndroid="transparent"
           placeholder="Enter your new password here"
@@ -170,10 +171,8 @@ handleEmail = (text) => {
         >
         <Text style={main.appButtonText}> Edit </Text>
         </TouchableOpacity>
-        {this.state.isNull ? null :
-        <Text style={{ paddingLeft: 20, paddingRight: 20, color: 'red' }}>
-                    {this.state.errorLength}</Text>}
         </Form>
+        </View>
       </Container>
     );
   }

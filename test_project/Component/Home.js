@@ -3,9 +3,10 @@ import React, { Component } from 'react';
 import { View, TouchableOpacity, ToastAndroid, FlatList, Image }
 from 'react-native';
 import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left,
-         Body, Right, Title } from 'native-base';
+         Body, Right, Title, Spinner } from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StarRating from 'react-native-star-rating';
+import { main } from '../css/styles';
 
 class Home extends Component {
   constructor(props) {
@@ -178,14 +179,14 @@ checkFavourite(locationId) {
         if (this.state.isLoading) {
           return (
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-              <Text>Loading..</Text>  
+              <Spinner color='black' />   
             </View>
           );
         }
           return (
             <Container>
               <Header>
-              <Title style={{ fontWeight: 'bold', fontSize: 20, alignSelf: 'center' }}>HOME</Title>
+              <Title style={main.headerText}>HOME</Title>
               </Header>
               <FlatList
                 data={this.state.listData}

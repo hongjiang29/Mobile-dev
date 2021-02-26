@@ -8,6 +8,8 @@ target 'test_project' do
 
   use_react_native!(:path => config["reactNativePath"])
 
+  pod 'TextToSpeech', :path => '../node_modules/react-native-tts'
+
   target 'test_projectTests' do
     inherit! :complete
     # Pods for testing

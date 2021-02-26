@@ -280,7 +280,7 @@ cameraLaunch = () => {
             <Text style={{ paddingLeft: 20, paddingRight: 20, color: 'red' }}>
             {this.state.errorLength}</Text>}
                 
-      <TouchableOpacity style={main.appButtonContainer} onPress={() => this.main()}>
+      <TouchableOpacity style={main.appButtonContainer} onPress={() => this.addreview()}>
       
       <Text style={main.appButtonText}> Add </Text>
         

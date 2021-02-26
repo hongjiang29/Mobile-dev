@@ -20,8 +20,8 @@ const main = StyleSheet.create({
     elevation: 8,
     backgroundColor: '#009688',
     borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
   },
   appButtonText: {
     fontSize: 18,
@@ -43,8 +43,12 @@ const main = StyleSheet.create({
     borderWidth: 1,
     marginHorizontal: 3
   },
-  text: {
-    
+
+  headerText: {
+    fontSize: 20, 
+    alignSelf: 'center',
+    fontWeight: 'bold',
+    color: 'white', 
   }
 });
 
@@ -119,9 +123,15 @@ const review = StyleSheet.create({
     backgroundColor: 'black',
     paddingTop: 2,
   },
+
+  textratingIcon: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    alignSelf: 'center'
+  },
   textrating: {
-      fontSize: 12,
-      fontWeight: 'bold'
+    fontSize: 12,
+    fontWeight: 'bold'
   },
 });
 
@@ -135,6 +145,12 @@ const search = StyleSheet.create({
     paddingHorizontal: 6
   },
 });
+const update = StyleSheet.create({
+container: {
+  flex: 10,
+  backgroundColor: '#FFF',
+},
 
+});
 
-export { login, editReview, main, logout, review, search };
+export { login, editReview, main, logout, review, search, update };
